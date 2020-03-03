@@ -1,0 +1,25 @@
+{
+  "name": "fooddelivery",
+  "version": "1.0.0",
+  "description": "aplication for order food",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "food",
+    "restaurant",
+    "express"
+  ],
+  "author": "herry",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
+    "env": "0.0.2",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1",
+    "qs": "^6.9.1"
+  }
+}
