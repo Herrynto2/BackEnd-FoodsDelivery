@@ -21,15 +21,22 @@ const getAuth = (req, res) => {
         })
     }
 }
+
+//Registration
 const getPost = async(req, res) => {
-    const { username, password, name, email } = req.body
+    const { username, password, name, email, gender, work } = req.body
     try {
-        const create = await user.create(username, password, name, email)
-        console.log(create)
-        if (create) {
-            res.send({ success: true, msg: 'User has been created' })
+        //Username validation : character must be <=15, smallword and can using number
+        var validasiHuruf = /^[a-z1-9]+$/;
+        if (username.match(validasiHuruf) && username.length <= 15) {
+            const create = await user.create(username, password, name, email, gender, work)
+            if (create) {
+                res.send({ success: true, msg: 'Registration success' })
+            } else {
+                res.send({ success: false, msg: 'Failed to registration' })
+            }
         } else {
-            res.send({ success: false, msg: 'Failed to create user' })
+            res.send({ success: false, msg: 'Failed' })
         }
     } catch (error) {
         res.send({ success: false, msg: error.message })
