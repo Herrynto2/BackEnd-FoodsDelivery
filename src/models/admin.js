@@ -49,14 +49,14 @@ module.exports = {
         },
         update: (id, params) => {
                 return new Promise((resolve, reject) => {
-                            conn.query(`SELECT COUNT(*) AS total from user where id_food = ${id}`,
+                            conn.query(`SELECT COUNT(*) AS total from foodsdata where id_food = ${id}`,
                                     (error, results, fields) => {
                                         if (!error) {
                                             const { total } = results[0]
                                             if (total === 0) {
                                                 resolve(false)
                                             } else {
-                                                conn.query(`UPDATE user set ${params.map(v => `${v.keys} = '${v.value}'`).join(' , ')} WHERE id = ${id}`,
+                                                conn.query(`UPDATE foodsdata set ${params.map(v => `${v.keys} = '${v.value}'`).join(' , ')} WHERE id_food = ${id}`,
                                 (error, results, fields) => {
                                     if (error) {
                                         reject(new Error(error))
