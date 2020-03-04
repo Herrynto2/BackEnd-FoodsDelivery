@@ -1,12 +1,11 @@
 const conn = require('../config/db')
 
 //Create table foodsdata
-conn.query(`CREATE TABLE users (
+conn.query(`CREATE TABLE foodrating (
     id Int(11) PRIMARY KEY AUTO_INCREMENT,
-    username varchar(40),
-    password varchar(60),
-    created_at datetime,
-    updated_at datetime
+    id_user Int(11),
+    id_food varchar(70),
+    rating int(11)
 )`, (error, result, fields) => {
     if (error) {
         throw error

@@ -17,31 +17,3 @@ conn.query(`CREATE TABLE foodsdata (
         console.log('success Migrating User')
     }
 })
-
-//Create table foodsreview
-conn.query(`CREATE TABLE foodsrating (
-    id Int(11) PRIMARY KEY AUTO_INCREMENT,
-    id_user Int(11) PRIMARY KEY,
-    id_food Int(11) PRIMARY KEY,
-    rating int(2),
-)`, (error, result, fields) => {
-    if (error) {
-        throw error
-    } else {
-        console.log('success Migrating User')
-    }
-})
-
-//Create table foodsreview
-conn.query(`CREATE TABLE foodsreview (
-    id Int(11) PRIMARY KEY AUTO_INCREMENT,
-    id_user Int(11) PRIMARY KEY,
-    id_food Int(11) PRIMARY KEY,
-    review varchar(60),
-)`, (error, result, fields) => {
-    if (error) {
-        throw error
-    } else {
-        console.log('success Migrating User')
-    }
-})
