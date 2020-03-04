@@ -2,7 +2,7 @@
 const express = require('express')
 const app = express()
 
-//Database and table connection
+//Database connection and table create
 const { migration } = require('./src/routes/migration')
 app.use('/migrate', migration)
 
