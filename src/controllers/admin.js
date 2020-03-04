@@ -58,21 +58,21 @@ const qs = require('qs')
 //     })
 // }
 
-// const getUser = async(req, res) => {
-//     const { id } = req.params
-//     const detail = await user.get(id)
-//     if (detail) {
-//         res.send({
-//             success: true,
-//             data: detail
-//         })
-//     } else {
-//         res.send({
-//             success: false,
-//             data: detail
-//         })
-//     }
-// }
+const getUser = async(req, res) => {
+    const { id } = req.params
+    const detail = await user.get(id)
+    if (detail) {
+        res.send({
+            success: true,
+            data: detail
+        })
+    } else {
+        res.send({
+            success: false,
+            data: detail
+        })
+    }
+}
 
 const postUser = async(req, res) => {
     const { name, price, description, images, created_by } = req.body
@@ -120,10 +120,10 @@ const deleteUser = async(req, res) => {
     const { id } = req.body
     const del = await user.delete(id)
     if (del) {
-        res.send({ success: true, Message: 'delete success' })
+        res.send({ success: true, Message: `delete ID :${id} success` })
     } else {
         res.send({ success: false, Message: 'delete failed' })
     }
 }
 
-module.exports = { postUser, patchUser, deleteUser }
+module.exports = { getUser, postUser, patchUser, deleteUser }

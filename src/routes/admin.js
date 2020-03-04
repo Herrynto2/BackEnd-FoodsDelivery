@@ -8,7 +8,7 @@ const { getUser, getAllUser, postUser, patchUser, deleteUser } = require('../con
 // app.get('/', getAllUser);
 
 //SELECT data user where id
-// app.get('/:id', getUser);
+app.get('/:id', getUser);
 
 //CREATE data user
 app.post("/", postUser);
@@ -17,6 +17,6 @@ app.post("/", postUser);
 app.patch("/:id", patchUser);
 
 // //DELETE data user 
-app.delete("/", deleteUser);
+app.delete("/:id", deleteUser);
 
 module.exports = { user: app }
