@@ -17,6 +17,6 @@ app.post("/", postUser);
 app.patch("/:id", patchUser);
 
 // //DELETE data user 
-app.delete("/:id", deleteUser);
+app.delete("/", deleteUser);
 
 module.exports = { user: app }

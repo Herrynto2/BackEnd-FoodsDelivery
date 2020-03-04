@@ -95,6 +95,7 @@ const patchUser = async(req, res) => {
     const key = Object.keys(req.body)
     const params = key.map((v, i) => {
         if (v && (key[i] === 'name' || key[i] === 'price' || key[i] === 'description' || key[i] === 'images' || key[i] === 'created_by')) {
+            console.log(key[i])
             if (req.body[key[i]]) {
                 return { keys: key[i], value: req.body[key[i]] }
             } else {

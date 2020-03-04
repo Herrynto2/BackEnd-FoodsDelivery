@@ -8,8 +8,8 @@ conn.query(`CREATE TABLE foodsdata (
     description varchar(100),
     images varchar(30),
     created_by varchar(30),
-    created_at datetime,
-    updated_at datetime
+    data_created varchar(30),
+    data_updated varchar(30)
 )`, (error, result, fields) => {
     if (error) {
         throw error

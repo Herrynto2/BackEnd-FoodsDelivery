@@ -1,4 +1,5 @@
 const conn = require('../config/db')
+const { dates } = require('./time')
 
 module.exports = {
         create: (name, price, description, images, created_by) => {
@@ -10,7 +11,7 @@ module.exports = {
                             if (total !== 0) {
                                 resolve(false)
                             } else {
-                                conn.query(`INSERT INTO foodsdata(name, price, description, images, created_by) VALUES ('${name}','${price}','${description}','${images}','${created_by}')`,
+                                conn.query(`INSERT INTO foodsdata(name, price, description, images, created_by, date_created) VALUES ('${name}','${price}','${description}','${images}','${created_by}','${dates()}')`,
                                     (error, results, fields) => {
                                         if (error) {
                                             reject(new Error(error))
