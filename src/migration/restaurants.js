@@ -20,7 +20,7 @@ conn.query(`CREATE TABLE restodata (
 //     id Int(11) PRIMARY KEY AUTO_INCREMENT,
 //     id_user Int(11) PRIMARY KEY,
 //     id_resto Int(11) PRIMARY KEY,
-//     rating int(2),
+//     rating int(2)
 // )`, (error, result, fields) => {
 //     if (error) {
 //         throw error
@@ -34,7 +34,7 @@ conn.query(`CREATE TABLE restodata (
 //     id Int(11) PRIMARY KEY AUTO_INCREMENT,
 //     id_user Int(11) PRIMARY KEY,
 //     id_resto Int(11) PRIMARY KEY,
-//     review varchar(60),
+//     review varchar(60)
 // )`, (error, result, fields) => {
 //     if (error) {
 //         throw error
