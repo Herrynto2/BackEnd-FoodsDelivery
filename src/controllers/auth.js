@@ -1,3 +1,4 @@
+const conn = require('../config/db')
 const user = require('../models/auth')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
@@ -43,16 +44,100 @@ const getPost = async(req, res) => {
     }
 }
 
+//Forgot the password
+const getChange = async(req, res) => {
+    const { username, password, email } = req.body
+    try {
+        const update = await user.update(username, password)
+        console.log(update)
+        if (update) {
+            res.send({ success: true, msg: 'Updated success' })
+        } else {
+            res.send({ success: false, msg: 'failed to registration' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: error.message })
+    }
+}
 
-// //Login
-// const getLogin = function(req, res) {
-//     const { username, password } = req.body
-//     conn.query(`SELECT * FROM foodsdata where username = ${username}`, (error, rows, fields) => {
-//         if (error) {
-//             console.log(error)
+
+
+
+
+// const getChange = async(req, res) => {
+//     const { id } = req.params
+//     const key = Object.keys(req.body)
+//     const params = key.map((v, i) => {
+//         if (v && (key[i] === 'username' || key[i] === 'password')) {
+//             if (req.body[key[i]]) {
+//                 return { keys: key[i], value: req.body[key[i]] }
+//             } else {
+//                 return null
+//             }
 //         } else {
-//             response.ok(rows, res)
+//             return null
 //         }
-//     })
+//     }).filter(o => o)
+//     try {
+//         const update = await user.update(id, params)
+//         if (update) {
+//             res.send({ success: true, msg: `user id ${id} has been updated` })
+//         } else {
+//             res.send({ success: false, msg: 'Failed to update user' })
+//         }
+//     } catch (error) {
+//         res.send({ success: false, msg: 'Error' })
+//     }
 // }
-module.exports = { getAuth, getPost }
+
+//
+// updateUser = function(req, res) {
+
+//     var id = req.body.id;
+//     var email = req.body.email;
+//     var password = req.body.password;
+
+//     connection.query('UPDATE  users SET password = ? WHERE id = ?', [password, id],
+//         function(error, rows, fields) {
+//             if (error) {
+//                 console.log(error)
+//             } else {
+//                 response.ok("Berhasil merubah user!", res)
+//             }
+//         });
+// }
+
+//Login still fail
+const getLog = async(req, res) => {
+    const { username, password } = req.params
+    const detail = await user.get(username)
+    console.log(username)
+    if (detail) {
+        res.send({
+            success: true,
+            data: detail
+        })
+    } else {
+        res.send({
+            success: false,
+            data: detail
+        })
+    }
+}
+
+
+
+// getLog2 = function(req, res) {
+//     var username = req.params.username;
+//     conn.query(`SELECT * FROM person where username = '${username}'`, [user_id],
+//         function(error, rows, fields) {
+//             if (error) {
+//                 console.log(error)
+//             } else {
+//                 response.ok(rows, res)
+//             }
+//         });
+// };
+
+
+module.exports = { getAuth, getPost, getLog, getChange }
