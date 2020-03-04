@@ -1,24 +1,67 @@
-const conn = require('../config/db')
+const { connquery } = require('../config/db')
 const user = require('../models/auth')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 require('dotenv').config()
 
 //Register
-const getAuth = (req, res) => {
-    const { username, password } = req.body
-    if (username && password) {
-        if ((username === 'admin') && (password === 'root')) {
-            const data = { email: 'herry@gmail.com' } //payload
-            const token = jwt.sign(data, process.env.APP_KEY, { expiresIn: '60m' })
+// const getAuth = (req, res) => {
+//     const { username, password } = req.body
+//     if (username && password) {
+//         if ((username === 'admin') && (password === 'root')) {
+//             const dataLogin = await new Promise((resolve, reject) => {
+//                 connquery(`SELECT * FROM users WHERE username='${username}'`,
+//                     (err, results) => {
+
+//                     })
+//             })
+//             const data = { email: 'herry@gmail.com' } //payload
+//             const token = jwt.sign(data, process.env.APP_KEY, { expiresIn: '60m' })
+//             res.send({
+//                 success: true,
+//                 msg: 'Login admin success',
+//                 data: { token }
+//             })
+//         }
+//         res.send({
+//             success: false,
+//             msg: 'Login failed'
+//         })
+//     }
+// }
+
+//Login
+const getLog = async(req, res, next) => {
+    try {
+        const { username, password } = req.body
+        if (username && password) {
+            const dataLogin = await new Promise((resolve, reject) => {
+                connquery(`SELECT id, username, password FROM users WHERE username='${username}'`,
+                    (err, results) => {
+                        if (!err && results[1].length > 0 && bcrypt.compareSync(password, results[1][0].password)) {
+                            const userData = { username }
+                            resolve(userData)
+                        } else {
+                            reject(new Error(err || 'Username Or Password Wrong'))
+                        }
+                    })
+            })
+            const token = jwt.sign(dataLogin, process.env.APP_KEY, { expiresIn: '1H' })
             res.send({
                 success: true,
-                msg: 'Login admin success',
-                data: { token }
+                msg: 'Login Success',
+                data: {
+                    token
+                }
             })
+        } else {
+            throw new Error('Username and Password is Required')
         }
-        res.send({
+    } catch (e) {
+        console.log(e)
+        res.status(401).send({
             success: false,
-            msg: 'Login failed'
+            msg: e.message
         })
     }
 }
@@ -60,84 +103,4 @@ const getChange = async(req, res) => {
     }
 }
 
-
-
-
-
-// const getChange = async(req, res) => {
-//     const { id } = req.params
-//     const key = Object.keys(req.body)
-//     const params = key.map((v, i) => {
-//         if (v && (key[i] === 'username' || key[i] === 'password')) {
-//             if (req.body[key[i]]) {
-//                 return { keys: key[i], value: req.body[key[i]] }
-//             } else {
-//                 return null
-//             }
-//         } else {
-//             return null
-//         }
-//     }).filter(o => o)
-//     try {
-//         const update = await user.update(id, params)
-//         if (update) {
-//             res.send({ success: true, msg: `user id ${id} has been updated` })
-//         } else {
-//             res.send({ success: false, msg: 'Failed to update user' })
-//         }
-//     } catch (error) {
-//         res.send({ success: false, msg: 'Error' })
-//     }
-// }
-
-//
-// updateUser = function(req, res) {
-
-//     var id = req.body.id;
-//     var email = req.body.email;
-//     var password = req.body.password;
-
-//     connection.query('UPDATE  users SET password = ? WHERE id = ?', [password, id],
-//         function(error, rows, fields) {
-//             if (error) {
-//                 console.log(error)
-//             } else {
-//                 response.ok("Berhasil merubah user!", res)
-//             }
-//         });
-// }
-
-//Login still fail
-const getLog = async(req, res) => {
-    const { username, password } = req.params
-    const detail = await user.get(username)
-    console.log(username)
-    if (detail) {
-        res.send({
-            success: true,
-            data: detail
-        })
-    } else {
-        res.send({
-            success: false,
-            data: detail
-        })
-    }
-}
-
-
-
-// getLog2 = function(req, res) {
-//     var username = req.params.username;
-//     conn.query(`SELECT * FROM person where username = '${username}'`, [user_id],
-//         function(error, rows, fields) {
-//             if (error) {
-//                 console.log(error)
-//             } else {
-//                 response.ok(rows, res)
-//             }
-//         });
-// };
-
-
-module.exports = { getAuth, getPost, getLog, getChange }
+module.exports = { getPost, getLog, getChange }

@@ -12,5 +12,4 @@ auth.get('/login', getLog)
 //forgotpassword
 auth.patch('/', getChange)
 
-
 module.exports = { auth }
