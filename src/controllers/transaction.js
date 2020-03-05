@@ -48,7 +48,7 @@ const topUp = async(req, res) => {
 
 const saveCart = async(req, res) => {
     const { id } = req.body
-    const del = await user.create(id)
+    const del = await user.creates(id)
     if (del) {
         res.send({ success: true, Message: `Item with id :${id} success to save in a cart` })
     } else {

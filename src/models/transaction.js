@@ -38,7 +38,7 @@ module.exports = {
                         if (total === 0) {
                             resolve(false)
                         } else {
-                            conn.query(`Insert into cart (name, price, description, images) select name, price, description, images from foodsdata where id = ${id}`,
+                            conn.query(`Insert into cart (id_restaurant, name, price, description, images) select id_restaurant, name, price, description, images from foodsdata where id = ${id}`,
                                 (error, results, fields) => {
                                     if (error) {
                                         reject(new Error(error))
@@ -52,6 +52,7 @@ module.exports = {
                 })
         })
     },
+    //still fail : cara 2 untuk mengatasi data yang sama masih tesave
     creates: (id) => {
         return new Promise((resolve, reject) => {
             conn.query(`SELECT COUNT(*) AS total from foodsdata where id = ${id}`,
@@ -64,11 +65,11 @@ module.exports = {
                             conn.query(`SELECT cart.name, foodsdata.name from cart join foodsdata on cart.name = foodsdata.name where foodsdata.id = ${id}`, (error, results, fields) => {
                                 if (!error) {
                                     const { total } = results[0]
-                                    if (total !== 0) {
+                                    if (total === 0) {
                                         resolve(false)
                                     } else {
                                         console.log(results)
-                                        conn.query(`Insert into cart (name, price, description, images) select name, price, description, images from foodsdata where id = ${id}`,
+                                        conn.query(`Insert into cart (id_restaurant, name, price, description, images) select id_restaurant, name, price, description, images from foodsdata where id = ${id}`,
                                             (error, results, fields) => {
                                                 if (error) {
                                                     reject(new Error(error))
@@ -86,34 +87,3 @@ module.exports = {
         })
     }
 }
-//     creates: (id) => {
-//         return new Promise((resolve, reject) => {
-//             conn.query(`SELECT COUNT(*) AS total from foodsdata where id = ${id}`,
-//                 (error, results, fields) => {
-//                     if (!error) {
-//                         const { total } = results[0]
-//                         if (total === 0) {
-//                             resolve(false)
-//                         } else {
-//                             conn.query(`SELECT cart.name, foodsdata.name from cart join foodsdata on cart.name=foodsdata.name where foodsdata.id = ${id}`,
-//                                 (error, results, fields) => {
-//                                     if (!error) {
-//                                         const { total } = results[0]
-//                                         if (total === 0) {
-//                                             resolve(false)
-//                                         } else {
-//                                             conn.query(`Insert into cart (name, price, description, images) select name, price, description, images from foodsdata where id = ${id}`,
-//                                                 (error, results, fields) => {
-//                                                     if (error) {
-//                                                         reject(new Error(error))
-//                                                     }
-//                                                     resolve(true)
-//                                                 })
-//                                         }
-//                         } else {
-//                         reject(new Error(error))
-//                     }
-//                 })
-//                         }
-//                 })
-// })
