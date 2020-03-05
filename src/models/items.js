@@ -93,7 +93,7 @@ module.exports = {
             })
         }
     },
-    pagination: (id, params) => {
+    search: (id, params) => {
         if (id) {
             return new Promise((resolve, reject) => {
                 conn.query(`SELECT * FROM foodsdata where id_item = ${id}`, (error, results, fields) => {

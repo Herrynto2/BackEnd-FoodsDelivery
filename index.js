@@ -8,7 +8,7 @@ app.use(bodyparser.urlencoded({ extended: false }))
 app.use(bodyparser.json())
 
 //Database connection and table create
-const { user } = require('./src/routes/admin')
+const { user } = require('./src/routes/items')
 const { users } = require('./src/routes/resto')
 const { transaction } = require('./src/routes/transaction')
 const { migration } = require('./src/routes/migration')
@@ -18,7 +18,7 @@ const { checktoken } = require('./src/middleware/authmiddleware')
 app.use('/migrate', migration)
 app.use('/auth', auth)
 app.use('/items', checktoken, user)
-app.use('/resto', checktoken, users)
+app.use('/restaurant', checktoken, users)
 app.use('/', checktoken, transaction)
 
 //Define Port Server

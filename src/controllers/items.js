@@ -1,4 +1,4 @@
-const user = require('../models/admin')
+const user = require('../models/items')
 var bcrypt = require('bcryptjs')
 var salt = bcrypt.genSaltSync(10);
 const qs = require('qs')

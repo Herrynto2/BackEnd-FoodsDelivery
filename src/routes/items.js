@@ -1,6 +1,6 @@
 const user = require('express').Router
 const app = user()
-const { pagination, getItems, addItem, editItem, deleteItem } = require('../controllers/admin')
+const { pagination, getItems, addItem, editItem, deleteItem } = require('../controllers/items')
 
 //SELECT ALL data user
 app.get('/', pagination);
