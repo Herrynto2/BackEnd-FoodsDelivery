@@ -5,30 +5,24 @@ const bcrypt = require('bcryptjs')
 require('dotenv').config()
 
 //Register
-// const getAuth = (req, res) => {
-//     const { username, password } = req.body
-//     if (username && password) {
-//         if ((username === 'admin') && (password === 'root')) {
-//             const dataLogin = await new Promise((resolve, reject) => {
-//                 connquery(`SELECT * FROM users WHERE username='${username}'`,
-//                     (err, results) => {
-
-//                     })
-//             })
-//             const data = { email: 'herry@gmail.com' } //payload
-//             const token = jwt.sign(data, process.env.APP_KEY, { expiresIn: '60m' })
-//             res.send({
-//                 success: true,
-//                 msg: 'Login admin success',
-//                 data: { token }
-//             })
-//         }
-//         res.send({
-//             success: false,
-//             msg: 'Login failed'
-//         })
-//     }
-// }
+const getAuth = (req, res) => {
+    const { username, password } = req.body
+    if (username && password) {
+        if ((username === 'admin') && (password === 'root')) {
+            const data = { email: 'herry@gmail.com' } //payload
+            const token = jwt.sign(data, process.env.APP_KEY, { expiresIn: '15m' })
+            res.send({
+                success: true,
+                msg: 'Login success',
+                data: { token }
+            })
+        }
+        res.send({
+            success: false,
+            msg: 'Login failed'
+        })
+    }
+}
 
 //Login
 const getLog = async(req, res, next) => {
@@ -103,4 +97,29 @@ const getChange = async(req, res) => {
     }
 }
 
-module.exports = { getPost, getLog, getChange }
+const UpdateProfile = (id, params) => {
+        return new Promise((resolve, reject) => {
+                    let query = []
+                    const paramsUsers = params.slice().filter(v => ['username', 'password'].includes(v.keys))
+                    console.log(params)
+                    console.log(paramsUsers)
+                    const paramsProfile = params.slice().filter((v) => ['name', 'email', 'gender', 'work'].includes(v.keys))
+                    if (paramsUsers.length > 0) {
+                        query.push(`UPDATE users SET ${paramsUsers.map(v => `${v.keys} = '${v.value}'`).join(' , ')} WHERE _id=${id}`)
+        }
+        if (paramsProfile.length > 0) {
+            query.push(`UPDATE userdetail SET ${paramsProfile.map(v => `${v.keys} = '${v.value}'`).join(' , ')} WHERE id_user=${id}`)
+        }
+        console.log(query)
+        runQuery(`${query.map((v) => v).join(';')}`, (err, results, fields) => {
+            if (err) {
+                reject(new Error(err))
+            }
+            console.log(results)
+            resolve(true)
+        })
+    })
+}
+
+
+module.exports = { getAuth, getPost, getLog, getChange, UpdateProfile }

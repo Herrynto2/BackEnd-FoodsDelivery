@@ -1,4 +1,4 @@
-function dates(params) {
+function date(params) {
     var months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     var myDays = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jum&#39;at', 'Sabtu'];
     var date = new Date();
@@ -10,7 +10,7 @@ function dates(params) {
     var year = (yy < 1000) ? yy + 1900 : yy;
     return `${thisDay}, ${day} ${months[month]} ${year}`
 }
-dates();
+date();
 
 function time() {
     date = new Date();
@@ -20,6 +20,5 @@ function time() {
     return `${jam}:${menit}:${detik}`
 }
 time()
-
-console.log(`${dates()} ; ${time()}`)
-module.exports = { dates };
+    // console.log(`${dates()} ; ${time()}`)
+module.exports = { date, time };

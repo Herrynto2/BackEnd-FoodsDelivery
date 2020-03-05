@@ -1,8 +1,8 @@
-const conn = require('../config/db')
+const { conn } = require('../config/db')
 const { dates } = require('./time')
 
 module.exports = {
-        create: (name, price, description, images, created_by) => {
+        create: (id_restaurant, id_category, name, price, description, images) => {
             return new Promise((resolve, reject) => {
                 conn.query(`SELECT COUNT(*) AS total from foodsdata where name = '${name}' LIMIT 1`,
                     (error, results, fields) => {
@@ -11,7 +11,7 @@ module.exports = {
                             if (total !== 0) {
                                 resolve(false)
                             } else {
-                                conn.query(`INSERT INTO foodsdata(name, price, description, images, created_by, date_created) VALUES ('${name}','${price}','${description}','${images}','${created_by}','${dates()}')`,
+                                conn.query(`INSERT INTO foodsdata(id_restaurant, id_category, name, price, description, images, date_created, date_updated) VALUES ('${id_restaurant}','${id_category}','${name}','${price}','${description}','${images}','${dates()}',' ')`,
                                     (error, results, fields) => {
                                         if (error) {
                                             reject(new Error(error))

@@ -1,4 +1,4 @@
-const user = require('../models/admin')
+const user = require('../models/resto')
 var bcrypt = require('bcryptjs')
 var salt = bcrypt.genSaltSync(10);
 const qs = require('qs')
@@ -75,9 +75,9 @@ const getUser = async(req, res) => {
 }
 
 const postUser = async(req, res) => {
-    const { id_restaurant, id_category, name, price, description, images, created_by } = req.body
+    const { name, logo, location, description, created_by } = req.body
     try {
-        const create = await user.create(id_restaurant, id_category, name, price, description, images, created_by)
+        const create = await user.create(name, logo, location, description, created_by)
         console.log(create)
         if (create) {
             res.send({ success: true, msg: 'User has been created' })
@@ -94,7 +94,7 @@ const patchUser = async(req, res) => {
     const { id } = req.params
     const key = Object.keys(req.body)
     const params = key.map((v, i) => {
-        if (v && (key[i] === 'name' || key[i] === 'price' || key[i] === 'description' || key[i] === 'images' || key[i] === 'created_by')) {
+        if (v && (key[i] === 'name' || key[i] === 'logo' || key[i] === 'location' || key[i] === 'description' || key[i] === 'created_by')) {
             console.log(key[i])
             if (req.body[key[i]]) {
                 return { keys: key[i], value: req.body[key[i]] }
@@ -108,9 +108,9 @@ const patchUser = async(req, res) => {
     try {
         const update = await user.update(id, params)
         if (update) {
-            res.send({ success: true, msg: `user id ${id} has been updated` })
+            res.send({ success: true, msg: `restaurant id ${id} has been updated` })
         } else {
-            res.send({ success: false, msg: 'Failed to update user' })
+            res.send({ success: false, msg: 'Failed to update Restaurant' })
         }
     } catch (error) {
         res.send({ success: false, msg: 'Error' })
