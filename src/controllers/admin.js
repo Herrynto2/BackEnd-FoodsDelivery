@@ -75,9 +75,9 @@ const getUser = async(req, res) => {
 }
 
 const postUser = async(req, res) => {
-    const { id_restaurant, id_category, name, price, description, images, created_by } = req.body
+    const { id_restaurant, id_category, name, price, description, images } = req.body
     try {
-        const create = await user.create(id_restaurant, id_category, name, price, description, images, created_by)
+        const create = await user.create(id_restaurant, id_category, name, price, description, images)
         console.log(create)
         if (create) {
             res.send({ success: true, msg: 'User has been created' })

@@ -9,6 +9,7 @@ const { getUser, getAllUser, postUser, patchUser, deleteUser } = require('../con
 
 //SELECT data user where id
 app.get('/:id', getUser);
+app.get('/', getUser);
 
 //CREATE data user
 app.post("/", postUser);

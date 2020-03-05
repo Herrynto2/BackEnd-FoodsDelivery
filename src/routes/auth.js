@@ -13,6 +13,6 @@ auth.post('/register', getPost)
 auth.get('/login', getLog)
 
 //forgotpassword
-auth.patch('/', getChange)
+auth.patch('/forgot', getChange)
 
 module.exports = { auth }

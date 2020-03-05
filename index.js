@@ -10,14 +10,16 @@ app.use(bodyparser.json())
 //Database connection and table create
 const { user } = require('./src/routes/admin')
 const { users } = require('./src/routes/resto')
+const { transaction } = require('./src/routes/transaction')
 const { migration } = require('./src/routes/migration')
 const { auth } = require('./src/routes/auth')
 const { checktoken } = require('./src/middleware/authmiddleware')
 
 app.use('/migrate', migration)
 app.use('/auth', auth)
-app.use('/user', checktoken, user)
-app.use('/users', checktoken, users)
+app.use('/items', checktoken, user)
+app.use('/resto', checktoken, users)
+app.use('/trans', checktoken, transaction)
 
 //Define Port Server
 app.listen(3000, () => {

@@ -1,17 +1,18 @@
 const { conn } = require('../config/db')
-const { date, time } = require('./time')
+const { dates, time } = require('./time')
 
 module.exports = {
-        create: (name, logo, location, description, created_by) => {
+        //Create Resto
+        create: (name_resto, logo, location, description, created_by) => {
             return new Promise((resolve, reject) => {
-                conn.query(`SELECT COUNT(*) AS total from restodata where name = '${name}' LIMIT 1`,
+                conn.query(`SELECT COUNT(*) AS total from restodata where name_resto = '${name_resto}' LIMIT 1`,
                     (error, results, fields) => {
                         if (!error) {
                             const { total } = results[0]
                             if (total !== 0) {
                                 resolve(false)
                             } else {
-                                conn.query(`INSERT INTO restodata(name, logo, location, description, created_by, date_created, date_updated) VALUES ('${name}','${logo}','${location}','${description}','${created_by}','${date()}','')`,
+                                conn.query(`INSERT INTO restodata(name_resto, logo, location, description, created_by, date_created) VALUES ('${name_resto}','${logo}','${location}','${description}','${created_by}','${dates()}')`,
                                     (error, results, fields) => {
                                         if (error) {
                                             reject(new Error(error))
@@ -25,6 +26,7 @@ module.exports = {
                     })
             })
         },
+        //delete Resto
         delete: (id) => {
             return new Promise((resolve, reject) => {
                 conn.query(`SELECT COUNT(*) AS total from restodata where id_resto = ${id}`,
@@ -48,6 +50,30 @@ module.exports = {
                     })
             })
         },
+        //Get a food from a resto (not yet)
+        getFood: (id, params) => {
+            //Command Detail GET 
+            if (id) {
+                return new Promise((resolve, reject) => {
+                    conn.query(`SELECT restodata.name_resto, restodata.logo, restodata.location, restodata.description, foodsdata.name, foodsdata.price,  foodsdata.images FROM restodata join foodsdata on restodata.id_resto = foodsdata.id_restaurant where foodsdata.id = ${id}`, (error, results, fields) => {
+                        if (error) reject(new Error(error))
+                        resolve(results[0])
+                    })
+                })
+            }
+        },
+        // Get List Restaurant (not yet)
+        getListResto: (id, params) => {
+            //Command Detail GET 
+            if (id) {
+                return new Promise((resolve, reject) => {
+                    conn.query(`SELECT * FROM restodata`, (error, results, fields) => {
+                        if (error) reject(new Error(error))
+                        resolve(results[0])
+                    })
+                })
+            }
+        },
         get: (id, params) => {
                 //Command Detail GET 
                 if (id) {
@@ -59,11 +85,7 @@ module.exports = {
                     })
                 } else {
                     return new Promise((resolve, reject) => {
-
-                                //Destructing Parameter
                                 const { perPage, currentPage, search, sort } = params
-
-                                //Searching & Pagination
                                 const condition = `${search && `WHERE ${search.map(v => `${v.keys} LIKE '${v.value}%'`).join(' AND ')}`} ORDER BY ${sort.keys} ${!sort.value ? 'ASC' : 'DESC'} ${(currentPage && perPage) && `LIMIT ${perPage} OFFSET ${parseInt(perPage) * (parseInt(currentPage) - 1)}`}`
                 console.log(condition)
 

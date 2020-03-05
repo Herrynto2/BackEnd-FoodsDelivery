@@ -3,64 +3,80 @@ var bcrypt = require('bcryptjs')
 var salt = bcrypt.genSaltSync(10);
 const qs = require('qs')
 
-// const getAllUser = async(req, res) => {
-//     //Default Condition
-//     const params = {
-//         currentPage: req.query.page || 1,
-//         perPage: req.query.limit || 5,
-//         search: req.query.search || null,
-//         sort: req.query.sort || { keys: 'name', value: 0 }
-//     };
-//     //Reformatting Search
-//     const key = Object.keys(params.search)
-//     if (req.query.search) {
-//         params.search = key.map((v, i) => ({ keys: key[i], value: req.query.search[key[i]] }))
-//     }
-//     //Reformatting Sort
-//     const keysort = Object.keys(params.sort)
-//     if (req.query.sort) {
-//         params.sort = keysort.map((v, i) => ({ keys: key[i], value: req.query.sort[key[i]] }))
-//     }
+const getAllUser = async(req, res) => {
+    //Default Condition
+    const params = {
+        currentPage: req.query.page || 1,
+        perPage: req.query.limit || 5,
+        search: req.query.search || null,
+        sort: req.query.sort || { keys: 'name', value: 0 }
+    };
+    //Reformatting Search
+    const key = Object.keys(params.search)
+    if (req.query.search) {
+        params.search = key.map((v, i) => ({ keys: key[i], value: req.query.search[key[i]] }))
+    }
+    //Reformatting Sort
+    const keysort = Object.keys(params.sort)
+    if (req.query.sort) {
+        params.sort = keysort.map((v, i) => ({ keys: key[i], value: req.query.sort[key[i]] }))
+    }
 
-//     //Get data from user module
-//     const data = await user.get('', params);
+    //Get data from user module
+    const data = await user.get('', params);
 
-//     //Generatting Pagination
-//     const { query } = req
-//     query.page = parseInt(query.page + 1)
-//     if (!query.page) {
-//         query.page = '1'
-//     }
-//     console.log(query)
+    //Generatting Pagination
+    const { query } = req
+    query.page = parseInt(query.page + 1)
+    if (!query.page) {
+        query.page = '1'
+    }
+    console.log(query)
 
 
-//     const totalPages = Math.ceil(data.total / parseInt(params.perPage))
-//     query.page = parseInt(query.page) + 1
-//     const nextPage = (parseInt(params.currentPage) < totalPages ? process.env.APP_URL.concat('user?').concat(qs.stringify(query)) : null)
-//     console.log(nextPage)
-//     query.page = parseInt(query.page) - 2
-//     const previousPage = (parseInt(params.currentPage) > 1 ? process.env.APP_URL.concat('user?').concat(qs.stringify(query)) : null)
-//     console.log(previousPage)
-//     const pagination = {
-//         currentPage: parseInt(params.currentPage),
-//         nextPage,
-//         previousPage,
-//         totalPages,
-//         perPage: parseInt(params.perPage),
-//         totalEntries: data.total
-//     };
-//     //Send Response to End User
-//     res.send({
-//         success: true,
-//         data: data.results,
-//         pagination
+    const totalPages = Math.ceil(data.total / parseInt(params.perPage))
+    query.page = parseInt(query.page) + 1
+    const nextPage = (parseInt(params.currentPage) < totalPages ? process.env.APP_URL.concat('user?').concat(qs.stringify(query)) : null)
+    console.log(nextPage)
+    query.page = parseInt(query.page) - 2
+    const previousPage = (parseInt(params.currentPage) > 1 ? process.env.APP_URL.concat('user?').concat(qs.stringify(query)) : null)
+    console.log(previousPage)
+    const pagination = {
+        currentPage: parseInt(params.currentPage),
+        nextPage,
+        previousPage,
+        totalPages,
+        perPage: parseInt(params.perPage),
+        totalEntries: data.total
+    };
+    //Send Response to End User
+    res.send({
+        success: true,
+        data: data.results,
+        pagination
 
-//     })
-// }
+    })
+}
 
 const getUser = async(req, res) => {
+        const { id } = req.params
+        const detail = await user.getFood(id)
+        if (detail) {
+            res.send({
+                success: true,
+                data: detail
+            })
+        } else {
+            res.send({
+                success: false,
+                data: detail
+            })
+        }
+    }
+    //get list resto
+const getResto = async(req, res) => {
     const { id } = req.params
-    const detail = await user.get(id)
+    const detail = await user.getListResto(id)
     if (detail) {
         res.send({
             success: true,
@@ -75,9 +91,9 @@ const getUser = async(req, res) => {
 }
 
 const postUser = async(req, res) => {
-    const { name, logo, location, description, created_by } = req.body
+    const { name_resto, logo, location, description, created_by } = req.body
     try {
-        const create = await user.create(name, logo, location, description, created_by)
+        const create = await user.create(name_resto, logo, location, description, created_by)
         console.log(create)
         if (create) {
             res.send({ success: true, msg: 'User has been created' })
@@ -117,6 +133,8 @@ const patchUser = async(req, res) => {
     }
 }
 
+
+
 const deleteUser = async(req, res) => {
     const { id } = req.body
     const del = await user.delete(id)
@@ -127,4 +145,4 @@ const deleteUser = async(req, res) => {
     }
 }
 
-module.exports = { getUser, postUser, patchUser, deleteUser }
+module.exports = { getUser, getResto, getAllUser, postUser, patchUser, deleteUser }
