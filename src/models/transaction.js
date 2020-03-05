@@ -29,7 +29,7 @@ module.exports = {
                 })
         })
     },
-    //still fail : cara 2 untuk mengatasi data yang sama masih tesave
+    //Delete Items
     delete: (id) => {
         return new Promise((resolve, reject) => {
             conn.query(`SELECT COUNT(*) AS total from cart where id = ${id}`,
@@ -53,6 +53,7 @@ module.exports = {
                 })
         })
     }, 
+    //Save item in cart
     create: (id) => {
         return new Promise((resolve, reject) => {
             conn.query(`SELECT COUNT(*) AS total from foodsdata where id = ${id}`,
@@ -75,6 +76,25 @@ module.exports = {
                     }
                 })
         })
+    },
+    //Check list item
+    get: (id, params) => {
+        //Command Detail GET 
+        if (id) {
+            return new Promise((resolve, reject) => {
+                conn.query(`SELECT * FROM cart where id = ${id}`, (error, results, fields) => {
+                    if (error) reject(new Error(error))
+                    resolve(results[0])
+                })
+            })
+        } else {
+            return new Promise((resolve, reject) => {
+                conn.query(`SELECT * FROM cart`, (error, results, fields) => {
+                    if (error) reject(new Error(error))
+                    resolve(results)
+                })
+            })
+        }
     }
     // creates: (id) => {
     //     return new Promise((resolve, reject) => {

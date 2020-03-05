@@ -58,4 +58,22 @@ const saveCart = async(req, res) => {
     }
 }
 
-module.exports = { topUp, saveCart, delItem }
+const checkItem = async(req, res) => {
+    const { id } = req.params
+    const detail = await user.get(id)
+    if (detail.length > 1) {
+        res.send({
+            success: true,
+            data: detail,
+            total_Item: detail.length,
+            checkout: detail.map(e => e.price).reduce((i, v) => i + v)
+        })
+    } else {
+        res.send({
+            success: false,
+            data: detail
+        })
+    }
+}
+
+module.exports = { topUp, saveCart, delItem, checkItem }
