@@ -19,7 +19,7 @@ app.use('/migrate', migration)
 app.use('/auth', auth)
 app.use('/items', checktoken, user)
 app.use('/resto', checktoken, users)
-app.use('/trans', checktoken, transaction)
+app.use('/', checktoken, transaction)
 
 //Define Port Server
 app.listen(3000, () => {

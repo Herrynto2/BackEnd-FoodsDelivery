@@ -1,24 +1,19 @@
 //Import express
 const user = require('express').Router
 const app = user()
-const { topup } = require('../controllers/transaction')
+const { topUp, saveCart, listcart } = require('../controllers/transaction')
 
-// //SELECT ALL data 
-// app.get('/', getAllUser);
+//Save items to Cart
+app.post("/savecart", saveCart);
 
-// //Select ALL Resto
-// app.get('/', getResto);
+// //Search item as id at Cart
+// app.get("/cart/:id", listcart);
 
-// //SELECT data detail
-// app.get('/:id', getUser);
-
-// //CREATE data user
-// app.post("/", postUser);
-
-// //EDIT data user
-app.patch("/:id", topup);
+//Top Up
+app.patch("/topup/:id", topUp);
 
 // // //DELETE data user 
-// app.delete("/", deleteUser);
+// app.delete("/delete", deleteItem);
+
 
 module.exports = { transaction: app }
