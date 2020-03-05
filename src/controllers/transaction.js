@@ -29,31 +29,33 @@ const topUp = async(req, res) => {
     }
 }
 
-// const saveCart = async(req, res) => {
-//     const { id } = req.body
-//     console.log(id)
-//     try {
-//         const create = await user.create(id)
-//         console.log(create)
-//         if (create) {
-//             res.send({ success: true, msg: 'User has been created' })
-//         } else {
-
-//             res.send({ success: false, msg: 'Failed to create user' })
-//         }
-//     } catch (error) {
-//         res.send({ success: false, msg: error })
-//     }
-// }
-
-const saveCart = async(req, res) => {
+const delItem = async(req, res) => {
     const { id } = req.body
-    const del = await user.creates(id)
-    if (del) {
-        res.send({ success: true, Message: `Item with id :${id} success to save in a cart` })
-    } else {
-        res.send({ success: false, Message: 'failed to save in a cart' })
+    console.log(id)
+    try {
+        const del = await user.delete(id)
+        if (del) {
+            res.send({ success: true, msg: `Item with id :${id} success to deleted` })
+        } else {
+            res.send({ success: false, msg: 'Failed to delete item' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: error })
     }
 }
 
-module.exports = { topUp, saveCart }
+const saveCart = async(req, res) => {
+    const { id } = req.body
+    try {
+        const create = await user.create(id)
+        if (create) {
+            res.send({ success: true, Message: `Item with id : ${id} success to save in a cart` })
+        } else {
+            res.send({ success: false, Message: 'failed to save in a cart' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: error })
+    }
+}
+
+module.exports = { topUp, saveCart, delItem }
