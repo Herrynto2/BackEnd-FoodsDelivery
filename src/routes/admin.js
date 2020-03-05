@@ -1,23 +1,21 @@
-//Import express
 const user = require('express').Router
 const app = user()
-const { getUser, getAllUser, postUser, patchUser, deleteUser } = require('../controllers/admin')
+const { pagination, getItems, addItem, editItem, deleteItem } = require('../controllers/admin')
 
-///////////////////////////Query JSON///////////////////////////////
 //SELECT ALL data user
-// app.get('/', getAllUser);
+app.get('/', pagination);
 
-//SELECT data user where id
-app.get('/:id', getUser);
-app.get('/', getUser);
+//Select Items
+app.get('/:id', getItems);
+app.get('/', getItems);
 
-//CREATE data user
-app.post("/", postUser);
+//Add Items
+app.post("/", addItem);
 
-// //EDIT data user
-app.patch("/:id", patchUser);
+//Edit Items
+app.patch("/:id", editItem);
 
-// //DELETE data user 
-app.delete("/", deleteUser);
+//Delete Items
+app.delete("/", deleteItem);
 
 module.exports = { user: app }

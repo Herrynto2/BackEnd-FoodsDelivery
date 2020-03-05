@@ -70,10 +70,45 @@ const checkItem = async(req, res) => {
         })
     } else {
         res.send({
-            success: false,
+            success: true,
             data: detail
         })
     }
 }
 
-module.exports = { topUp, saveCart, delItem, checkItem }
+
+const checkItems = async(req, res) => {
+    const { id } = req.params
+    const detail = await user.gets(id)
+    if (detail.length > 1) {
+        res.send({
+            success: true,
+            data: detail,
+            total_Item: detail.length,
+            checkout: detail.map(e => e.price).reduce((i, v) => i + v)
+        })
+    } else {
+        res.send({
+            success: true,
+            data: detail
+        })
+    }
+}
+
+//Checkout
+const checkOutItem = async(req, res) => {
+    const { id } = req.body
+    console.log(id)
+    try {
+        const check = await user.checkout(id)
+        if (check) {
+            res.send({ success: check, msg: `success` })
+        } else {
+            res.send({ success: false, msg: 'Failed' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: error })
+    }
+}
+
+module.exports = { topUp, saveCart, delItem, checkItem, checkItems, checkOutItem }

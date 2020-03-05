@@ -25,7 +25,7 @@ const getAuth = (req, res) => {
 }
 
 //Login
-const getLog = async(req, res, next) => {
+const login = async(req, res, next) => {
     try {
         const { username, password } = req.body
         if (username && password) {
@@ -61,13 +61,12 @@ const getLog = async(req, res, next) => {
 }
 
 //Registration
-const getPost = async(req, res) => {
-    const { username, password, name, email, gender, work } = req.body
+const regist = async(req, res) => {
+    const { username, password, name, email, gender, address, work } = req.body
     try {
-        //Username validation : character must be <=15, smallword and can using number
         var validasiHuruf = /^[a-z1-9]+$/;
         if (username.match(validasiHuruf) && username.length <= 15) {
-            const create = await user.create(username, password, name, email, gender, work)
+            const create = await user.create(username, password, name, email, address, gender, work)
             if (create) {
                 res.send({ success: true, msg: 'Registration success' })
             } else {
@@ -82,7 +81,7 @@ const getPost = async(req, res) => {
 }
 
 //Forgot the password
-const getChange = async(req, res) => {
+const forgot = async(req, res) => {
     const { username, password } = req.body
     try {
         const update = await user.update(username, password)
@@ -97,7 +96,35 @@ const getChange = async(req, res) => {
     }
 }
 
+const changeData = async(req, res) => {
+    const { username, password } = req.body
+    try {
+        const update = await user.change(username, password)
+        console.log(update)
+        if (update) {
+            res.send({ success: true, msg: 'Updated success' })
+        } else {
+            res.send({ success: false, msg: 'failed to registration' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: error.message })
+    }
+}
+
+const postUser = async(req, res) => {
+    const { name_item, price } = req.body
+    try {
+        const create = await user.creates(name_item, price)
+        console.log(create)
+        if (create) {
+            res.send({ success: true, msg: 'User has been created' })
+        } else {
+            res.send({ success: false, msg: 'Failed to create user' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: error })
+    }
+}
 
 
-
-module.exports = { getAuth, getPost, getLog, getChange }
+module.exports = { getAuth, login, regist, forgot, changeData, postUser }
