@@ -125,18 +125,30 @@ const forgot = async(req, res) => {
 }
 
 //change data user
-const changeData = async(req, res) => {
-    const { username, password } = req.body
-    try {
-        const update = await user.change(username, password)
-        console.log(update)
-        if (update) {
-            res.send({ success: true, msg: 'Updated success' })
+const changeProfile = async(req, res) => {
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'name_user' || key[i] === 'email' || key[i] === 'gender' || key[i] === 'address' || key[i] === 'work')) {
+            console.log(key[i])
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
         } else {
-            res.send({ success: false, msg: 'failed to registration' })
+            return null
+        }
+    }).filter(o => o)
+    try {
+        const update = await user.change(id, params)
+        if (update) {
+            res.send({ success: true, msg: `User profile id ${id} has been updated` })
+        } else {
+            res.send({ success: false, msg: 'Failed to change profile' })
         }
     } catch (error) {
-        res.send({ success: false, msg: error.message })
+        res.send({ success: false, msg: 'Error' })
     }
 }
 
@@ -167,4 +179,4 @@ const deleteUser = async(req, res) => {
 // }
 
 
-module.exports = { getAuth, login, regist, regVerify, forgot, changeData, deleteUser }
+module.exports = { getAuth, login, regist, regVerify, forgot, changeProfile, deleteUser }
