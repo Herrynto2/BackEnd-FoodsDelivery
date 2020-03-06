@@ -3,7 +3,7 @@ var bcrypt = require('bcryptjs')
 var salt = bcrypt.genSaltSync(10);
 const qs = require('qs')
 
-const getAllUser = async(req, res) => {
+const pagination = async(req, res) => {
     //Default Condition
     const params = {
         currentPage: req.query.page || 1,
@@ -58,29 +58,15 @@ const getAllUser = async(req, res) => {
     })
 }
 
-const getUser = async(req, res) => {
-        const { id } = req.params
-        const detail = await user.getFood(id)
-        if (detail) {
-            res.send({
-                success: true,
-                data: detail
-            })
-        } else {
-            res.send({
-                success: false,
-                data: detail
-            })
-        }
-    }
-    //get list resto
+//List Restaurant
 const getResto = async(req, res) => {
     const { id } = req.params
-    const detail = await user.getListResto(id)
+    const detail = await user.get(id)
     if (detail) {
         res.send({
             success: true,
-            data: detail
+            data: detail,
+            total: detail.length
         })
     } else {
         res.send({
@@ -90,11 +76,10 @@ const getResto = async(req, res) => {
     }
 }
 
-const postUser = async(req, res) => {
-    const { name_resto, logo, location, description, created_by } = req.body
+const addResto = async(req, res) => {
+    const { name_restaurant, logo, location, description, created_by } = req.body
     try {
-        const create = await user.create(name_resto, logo, location, description, created_by)
-        console.log(create)
+        const create = await user.create(name_restaurant, logo, location, description, created_by)
         if (create) {
             res.send({ success: true, msg: 'User has been created' })
         } else {
@@ -106,11 +91,11 @@ const postUser = async(req, res) => {
 }
 
 
-const patchUser = async(req, res) => {
+const editResto = async(req, res) => {
     const { id } = req.params
     const key = Object.keys(req.body)
     const params = key.map((v, i) => {
-        if (v && (key[i] === 'name' || key[i] === 'logo' || key[i] === 'location' || key[i] === 'description' || key[i] === 'created_by')) {
+        if (v && (key[i] === 'name_restaurant' || key[i] === 'logo' || key[i] === 'location' || key[i] === 'description' || key[i] === 'created_by')) {
             console.log(key[i])
             if (req.body[key[i]]) {
                 return { keys: key[i], value: req.body[key[i]] }
@@ -135,7 +120,7 @@ const patchUser = async(req, res) => {
 
 
 
-const deleteUser = async(req, res) => {
+const deleteResto = async(req, res) => {
     const { id } = req.body
     const del = await user.delete(id)
     if (del) {
@@ -145,4 +130,4 @@ const deleteUser = async(req, res) => {
     }
 }
 
-module.exports = { getUser, getResto, getAllUser, postUser, patchUser, deleteUser }
+module.exports = { pagination, getResto, addResto, editResto, deleteResto }

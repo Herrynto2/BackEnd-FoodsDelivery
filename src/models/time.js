@@ -21,5 +21,15 @@ function time() {
 }
 time()
 
-console.log(`${dates()} ; ${time()}`)
-module.exports = { dates };
+function codes() {
+    const char = "123456789ABCDEFGHIJKLMNOPQRSTUVWXTZ";
+    let code = '';
+    for (let i = 0; i < 7; i++) {
+        let hasil = Math.floor(Math.random() * char.length);
+        code += char.substring(hasil, hasil + 1);
+    }
+    return code
+}
+codes()
+
+module.exports = { dates, time, codes };

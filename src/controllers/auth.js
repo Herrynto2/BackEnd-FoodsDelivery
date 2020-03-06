@@ -1,10 +1,10 @@
-const { connquery } = require('../config/db')
+const { conn, connquery } = require('../config/db')
 const user = require('../models/auth')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 require('dotenv').config()
 
-//Register
+//Authentication Static
 const getAuth = (req, res) => {
     const { username, password } = req.body
     if (username && password) {
@@ -65,18 +65,46 @@ const regist = async(req, res) => {
     const { username, password, name, email, gender, address, work } = req.body
     try {
         var validasiHuruf = /^[a-z1-9]+$/;
-        if (username.match(validasiHuruf) && username.length <= 15) {
-            const create = await user.create(username, password, name, email, address, gender, work)
+        if (username.match(validasiHuruf) && username.length <= 15 && username.length >= 6) {
+            const create = await user.create(username, password, name, email, gender, address, work)
             if (create) {
-                res.send({ success: true, msg: 'Registration success' })
+                res.send({ success: true, msg: 'Registration success', Verification_codes: create })
             } else {
                 res.send({ success: false, msg: 'Failed to registration' })
             }
         } else {
-            res.send({ success: false, msg: 'Failed' })
+            res.send({ success: false, msg: 'Failed to registration' })
         }
     } catch (error) {
         res.send({ success: false, msg: error.message })
+    }
+}
+
+//Registration Verify
+const regVerify = async(req, res) => {
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'is_verified' || key[i] === 'verification_code')) {
+            console.log(key[i])
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+    }).filter(o => o)
+    try {
+        const update = await user.verifyreg(id, params)
+        if (update) {
+            res.send({ success: true, msg: `verify success` })
+        } else {
+            res.send({ success: false, msg: 'Failed success' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: 'Error' })
     }
 }
 
@@ -96,6 +124,7 @@ const forgot = async(req, res) => {
     }
 }
 
+//change data user
 const changeData = async(req, res) => {
     const { username, password } = req.body
     try {
@@ -111,20 +140,31 @@ const changeData = async(req, res) => {
     }
 }
 
-const postUser = async(req, res) => {
-    const { name_item, price } = req.body
-    try {
-        const create = await user.creates(name_item, price)
-        console.log(create)
-        if (create) {
-            res.send({ success: true, msg: 'User has been created' })
-        } else {
-            res.send({ success: false, msg: 'Failed to create user' })
-        }
-    } catch (error) {
-        res.send({ success: false, msg: error })
+//Delete User
+const deleteUser = async(req, res) => {
+    const { id } = req.body
+    const del = await user.delete(id)
+    if (del) {
+        res.send({ success: true, Message: `delete data user ID :${id} success` })
+    } else {
+        res.send({ success: false, Message: 'delete failed' })
     }
 }
 
+// const postUser = async(req, res) => {
+//     const { name_item, price } = req.body
+//     try {
+//         const create = await user.creates(name_item, price)
+//         console.log(create)
+//         if (create) {
+//             res.send({ success: true, msg: 'User has been created' })
+//         } else {
+//             res.send({ success: false, msg: 'Failed to create user' })
+//         }
+//     } catch (error) {
+//         res.send({ success: false, msg: error })
+//     }
+// }
 
-module.exports = { getAuth, login, regist, forgot, changeData, postUser }
+
+module.exports = { getAuth, login, regist, regVerify, forgot, changeData, deleteUser }
