@@ -14,7 +14,7 @@ auth.post('/login', login)
 //forgotpassword
 auth.patch('/forgot-password', forgotPass)
 
-auth.get('/profile/get/:id', checktoken, getProfile); //User General : Display the user profile
+auth.get('/profile/:id', checktoken, getProfile); //User General : Display the user profile
 auth.patch('/profile/:id', checktoken, changeProfile) //User General : Change profile
 auth.delete('/profile', checktoken, delProfile) //User General : delete Profile
 

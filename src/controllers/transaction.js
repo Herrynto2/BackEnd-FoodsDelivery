@@ -54,9 +54,9 @@ const delItem = async(req, res) => {
         if (parseInt(id) === parseInt(req.auth.id)) {
             const del = await user.delete(id, params)
             if (del) {
-                res.send({ success: true, msg: `Delete success` })
+                res.send({ success: true, msg: `Delete item success` })
             } else {
-                res.send({ success: false, msg: 'Failed to top up' })
+                res.send({ success: false, msg: 'Failed delete item' })
             }
         } else {
             res.send({ success: false, msg: 'Invalid user id' })
@@ -162,8 +162,7 @@ const addReview = async(req, res) => {
 }
 
 //Edit Review Items
-//Add Review items
-const addReview = async(req, res) => {
+const editReview = async(req, res) => {
     const { id } = req.params
     const key = Object.keys(req.body)
     const params = key.map((v, i) => {
@@ -179,7 +178,7 @@ const addReview = async(req, res) => {
     }).filter(o => o)
     try {
         if (parseInt(id) === parseInt(req.auth.id)) {
-            const del = await user.postReview(id, params)
+            const del = await user.patchReview(id, params)
             if (del) {
                 res.send({ success: true, msg: `success to give review` })
             } else {
@@ -193,4 +192,4 @@ const addReview = async(req, res) => {
     }
 }
 
-module.exports = { topUp, saveCart, delItem, checkItem, checkOutItem, addReview }
+module.exports = { topUp, saveCart, delItem, checkItem, checkOutItem, addReview, editReview }
