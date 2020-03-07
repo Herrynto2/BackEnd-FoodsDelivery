@@ -10,7 +10,7 @@ function checktoken(req, res, next) {
     } else {
         res.send({
             success: false,
-            msg: 'Not Authorized'
+            msg: 'Please login first'
         })
     }
     //checking kevalidan jwt

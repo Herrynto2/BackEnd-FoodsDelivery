@@ -89,59 +89,7 @@ module.exports = {
                 })
             })
         }
-    }, 
-    //Give Review Items
-    postReview: (id, params) => {
-        return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from foodsdata where id_item = ${parseInt(params[1].value)}`,
-                (error, results, fields) => {
-                    console.log(parseInt(params[1].value))
-                    if (!error) {
-                        const { total } = results[0]
-                        if (total === 0) {
-                            resolve(false)
-                        } else {
-                            conn.query(`INSERT INTO foodsreview (id_user, id_restaurant, id_item, review, rating) VALUES (${id}, ${parseInt(params[0].value)}, ${parseInt(params[1].value)}, '${params[2].value}' ,'${parseInt(params[3].value)}')`,
-                                (error, results, fields) => {
-
-                                    if (error) {
-                                        reject(new Error(error))
-                                    }
-                                    resolve(true)
-                                })
-                        }
-                    } else {
-                        reject(new Error(error))
-                    }
-                })
-        })
-    }, 
-    //Edit Review Items
-    patchReview: (id, params) => {
-        return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from foodsreview where id_user = ${id} && id_item = ${parseInt(params[1].value)}`,
-                (error, results, fields) => {
-                    console.log(parseInt(params[1].value))
-                    if (!error) {
-                        const { total } = results[0]
-                        if (total === 0) {
-                            resolve(false)
-                        } else {
-                            conn.query(`UPDATE foodsreview set ${params.map(v => `${v.keys} = '${v.value}'`)}+${results[0].Saldo}  WHERE id_item = ${params[1].value}`,
-                                (error, results, fields) => {
-
-                                    if (error) {
-                                        reject(new Error(error))
-                                    }
-                                    resolve(true)
-                                })
-                        }
-                    } else {
-                        reject(new Error(error))
-                    }
-                })
-        })
-    }, 
+    },  
    //Checkout
     checkout: (id) => {
         return new Promise((resolve, reject) => {

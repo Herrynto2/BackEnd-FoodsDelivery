@@ -165,4 +165,129 @@ const deleteItem = async(req, res) => {
     }
 }
 
-module.exports = { pagination, getItems, addItem, editItem, deleteItem }
+//Add Review items
+const addReview = async(req, res) => {
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'id_item' || key[i] === 'id_restaurant' || key[i] === 'review' || key[i] === 'rating')) {
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const del = await user.postReview(id, params)
+            if (del) {
+                res.send({ success: true, msg: `success to give review` })
+            } else {
+                res.send({ success: false, msg: 'Failed to give review' })
+            }
+        } else {
+            res.send({ success: false, msg: 'Invalid user id' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: error.message })
+    }
+}
+
+//Edit Review Items
+const editReview = async(req, res) => {
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'id_item' || key[i] === 'review' || key[i] === 'rating')) {
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const del = await user.patchReview(id, params)
+            if (del) {
+                res.send({ success: true, msg: `success to edit review` })
+            } else {
+                res.send({ success: false, msg: 'Failed to edit review' })
+            }
+        } else {
+            res.send({ success: false, msg: 'Invalid user id' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: error.message })
+    }
+}
+
+//get list review
+const listReview = async(req, res) => {
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'id_item')) {
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const detail = await user.getReview(id, params)
+            console.log(detail)
+            if (detail) {
+                res.send({ success: true, name_item: detail[0].name_item, detail: detail })
+            } else {
+                res.send({ success: false, msg: 'item not found' })
+            }
+        } else {
+            res.send({ success: false, msg: 'Invalid User' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: error.message })
+    }
+}
+
+const deleteReview = async(req, res) => {
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'id_item')) {
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const detail = await user.delReview(id, params)
+            console.log(detail)
+            if (detail) {
+                res.send({ success: true, msg: 'delete review success' })
+            } else {
+                res.send({ success: false, msg: 'item not found' })
+            }
+        } else {
+            res.send({ success: false, msg: 'Invalid User' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: error.message })
+    }
+}
+
+module.exports = { pagination, getItems, addItem, editItem, deleteItem, addReview, editReview, listReview, deleteReview }

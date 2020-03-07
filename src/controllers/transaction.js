@@ -130,66 +130,6 @@ const checkOutItem = async(req, res) => {
     }
 }
 
-//Add Review items
-const addReview = async(req, res) => {
-    const { id } = req.params
-    const key = Object.keys(req.body)
-    const params = key.map((v, i) => {
-        if (v && (key[i] === 'id_item' || key[i] === 'id_restaurant' || key[i] === 'review' || key[i] === 'rating')) {
-            if (req.body[key[i]]) {
-                return { keys: key[i], value: req.body[key[i]] }
-            } else {
-                return null
-            }
-        } else {
-            return null
-        }
-    }).filter(o => o)
-    try {
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const del = await user.postReview(id, params)
-            if (del) {
-                res.send({ success: true, msg: `success to give review` })
-            } else {
-                res.send({ success: false, msg: 'Failed to give review' })
-            }
-        } else {
-            res.send({ success: false, msg: 'Invalid user id' })
-        }
-    } catch (error) {
-        res.send({ success: false, msg: 'Error' })
-    }
-}
 
-//Edit Review Items
-const editReview = async(req, res) => {
-    const { id } = req.params
-    const key = Object.keys(req.body)
-    const params = key.map((v, i) => {
-        if (v && (key[i] === 'id_item' || key[i] === 'id_restaurant' || key[i] === 'review' || key[i] === 'rating')) {
-            if (req.body[key[i]]) {
-                return { keys: key[i], value: req.body[key[i]] }
-            } else {
-                return null
-            }
-        } else {
-            return null
-        }
-    }).filter(o => o)
-    try {
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const del = await user.patchReview(id, params)
-            if (del) {
-                res.send({ success: true, msg: `success to give review` })
-            } else {
-                res.send({ success: false, msg: 'Failed to give review' })
-            }
-        } else {
-            res.send({ success: false, msg: 'Invalid user id' })
-        }
-    } catch (error) {
-        res.send({ success: false, msg: 'Error' })
-    }
-}
 
-module.exports = { topUp, saveCart, delItem, checkItem, checkOutItem, addReview, editReview }
+module.exports = { topUp, saveCart, delItem, checkItem, checkOutItem }

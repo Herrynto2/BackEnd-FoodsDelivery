@@ -102,29 +102,10 @@ module.exports = {
                 })
         })
     },
-    //get list order
-    getorder : (id, params) => {
-        if (id) {
-            return new Promise((resolve, reject) => {
-                console.log(id)
-                conn.query(`SELECT name_user, name_item, total, total_price, date_created FROM transaction WHERE id_user = ${id}`, (error, results, fields) => {
-                    if (error) reject(new Error(error))
-                    resolve(results)
-                })
-            })
-        } else {
-            return new Promise((resolve, reject) => {
-                conn.query(`SELECT name_user, name_item, total, total_price, date_created FROM transaction`, (error, results, fields) => {
-                    if (error) reject(new Error(error))
-                    resolve(results)
-                })
-            })
-        }
-    },
     //Add Categories
     addcategor: (id, params) => {
         return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from categories where category = '${params[1].value}' LIMIT 1`,
+            conn.query(`SELECT COUNT(*) AS total from categories where category = '${params[1].value}' && id_restaurant = ${params[0].value} LIMIT 1`,
                 (error, results, fields) => {
                     console.log(params[1].value)
                     if (!error) {
@@ -134,6 +115,32 @@ module.exports = {
                             resolve(false)
                         } else {
                             conn.query(`INSERT INTO categories(id_restaurant, category) VALUES (${params[0].value}, '${params[1].value}')`,
+                                (error, results, fields) => {
+                                    if (error) {
+                                        reject(new Error(error))
+                                    }
+                                    resolve(true)
+                                })
+                        }
+                    } else {
+                        reject(new Error(error))
+                    }
+                })
+        })
+    },
+    //Edit Categories
+    editcategor: (id, params) => {
+        return new Promise((resolve, reject) => {
+            conn.query(`SELECT COUNT(*) AS total from categories where id_category = ${params[1].value} && id_restaurant = ${params[0].value} LIMIT 1`,
+                (error, results, fields) => {
+                    console.log(params[1].value)
+                    if (!error) {
+                        const { total } = results[0]
+                        console.log(total)
+                        if (total === 0) {
+                            resolve(false)
+                        } else {
+                            conn.query(`UPDATE categories SET category = '${params[2].value}' WHERE id_category = ${params[1].value} `,
                                 (error, results, fields) => {
                                     if (error) {
                                         reject(new Error(error))
@@ -165,6 +172,31 @@ module.exports = {
                 })
             })
         }
+    },
+    //Edit Categories
+    deletecategor: (id, params) => {
+        return new Promise((resolve, reject) => {
+            conn.query(`SELECT COUNT(*) AS total from categories where id_category = ${params[0].value} LIMIT 1`,
+                (error, results, fields) => {
+                    if (!error) {
+                        const { total } = results[0]
+                        console.log(total)
+                        if (total === 0) {
+                            resolve(false)
+                        } else {
+                            conn.query(`DELETE FROM categories where id_category = ${params[0].value} `,
+                                (error, results, fields) => {
+                                    if (error) {
+                                        reject(new Error(error))
+                                    }
+                                    resolve(true)
+                                })
+                        }
+                    } else {
+                        reject(new Error(error))
+                    }
+                })
+        })
     },
     search: (id, params) => {
                 //Command Detail GET 

@@ -121,6 +121,90 @@ module.exports = {
                 })
             })
         }
+    },
+    //Give Review Items
+    postReview: (id, params) => {
+        return new Promise((resolve, reject) => {
+            conn.query(`SELECT COUNT(*) AS total from foodsdata where id_item = ${parseInt(params[1].value)}`,
+                (error, results, fields) => {
+                    console.log(parseInt(params[1].value))
+                    if (!error) {
+                        const { total } = results[0]
+                        if (total === 0) {
+                            resolve(false)
+                        } else {
+                            conn.query(`INSERT INTO foodreview (id_user, id_restaurant, id_item, review, rating) VALUES (${id}, ${parseInt(params[0].value)}, ${parseInt(params[1].value)}, '${params[2].value}' ,'${parseInt(params[3].value)}')`,
+                                (error, results, fields) => {
+
+                                    if (error) {
+                                        reject(new Error(error))
+                                    }
+                                    resolve(true)
+                                })
+                        }
+                    } else {
+                        reject(new Error(error))
+                    }
+                })
+        })
+    },
+    //Edit Review Items
+    patchReview: (id, params) => {
+        return new Promise((resolve, reject) => {
+            conn.query(`SELECT COUNT(*) AS total from foodreview where id_user = ${id} && id_item = ${parseInt(params[0].value)}`,
+                (error, results, fields) => {
+                    console.log(parseInt(params[1].value))
+                    if (!error) {
+                        const { total } = results[0]
+                        if (total === 0) {
+                            resolve(false)
+                        } else {
+                            conn.query(`UPDATE foodreview set ${params.map(v => `${v.keys} = '${v.value}'`)}  WHERE id_item = ${params[0].value}`,
+                                (error, results, fields) => {
+
+                                    if (error) {
+                                        reject(new Error(error))
+                                    }
+                                    resolve(true)
+                                })
+                        }
+                    } else {
+                        reject(new Error(error))
+                    }
+                })
+        })
+    }, //Get list item
+    getReview: (id, params) => {
+            return new Promise((resolve, reject) => {
+                conn.query(`SELECT foodsdata.name_item,foodreview.id_restaurant, foodreview.id_item,foodreview.id_user, foodreview.review, foodreview.rating, foodreview.date_created, foodreview.date_uploaded FROM foodreview JOIN foodsdata on foodreview.id_item = foodsdata.id_item WHERE foodreview.id_item = ${params[0].value}`, (error, results, fields) => {
+                    if (error) reject(new Error(error))
+                    resolve(results)
+                })
+            })
+        },
+    delReview: (id, params) => {
+        console.log(params)
+        return new Promise((resolve, reject) => {
+            conn.query(`SELECT COUNT(*) AS total from foodreview where id_item = ${parseInt(params[0].value)} && id_user = ${id}`,
+                (error, results, fields) => {
+                    console.log(params[0].value)
+                    if (!error) {
+                        const { total } = results[0]
+                        if (total === 0) {
+                            resolve(false)
+                        } else {
+                            conn.query(`DELETE FROM foodreview where id_item = ${params[0].value} && id_user = ${id}`,
+                                (error, results, fields) => {
+                                    if (error) {
+                                        reject(new Error(error))
+                                    }
+                                    resolve(true)
+                                })
+                        }
+                    } else {
+                        reject(new Error(error))
+                    }
+                })
+        })
     }
-    
 }

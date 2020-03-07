@@ -194,23 +194,6 @@ const deleteResto = async(req, res) => {
     }
 }
 
-//Search list customer who order
-const getlistOrder = async(req, res) => {
-    const { id } = req.params
-    const detail = await user.order(id)
-    if (detail) {
-        res.send({
-            success: true,
-            data: detail,
-            total: detail.length
-        })
-    } else {
-        res.send({
-            success: false,
-            data: detail
-        })
-    }
-}
 
 //Add Category
 const addCategory = async(req, res) => {
@@ -244,6 +227,37 @@ const addCategory = async(req, res) => {
     }
 }
 
+const editCategory = async(req, res) => {
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'id_restaurant' || key[i] === 'id_category' || key[i] === 'category')) {
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const update = await user.editcategor(id, params)
+            if (update) {
+                res.send({ success: true, msg: `Category successfully edit` })
+            } else {
+                res.send({ success: false, msg: 'Category id not found' })
+            }
+        } else {
+            res.send({ success: false, msg: 'Invalid id user' })
+        }
+
+    } catch (error) {
+        res.send({ success: false, msg: error.message })
+    }
+}
+
 //Search list category item
 const getcategory = async(req, res) => {
     const { id } = req.params
@@ -262,4 +276,35 @@ const getcategory = async(req, res) => {
     }
 }
 
-module.exports = { pagination, getProfileResto, getListResto, getlistOrder, addCategory, getcategory, addResto, editResto, deleteResto }
+const delCategory = async(req, res) => {
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'id_category')) {
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const update = await user.deletecategor(id, params)
+            if (update) {
+                res.send({ success: true, msg: `Category successfully deleted` })
+            } else {
+                res.send({ success: false, msg: 'Category id not found' })
+            }
+        } else {
+            res.send({ success: false, msg: 'Invalid id user' })
+        }
+
+    } catch (error) {
+        res.send({ success: false, msg: error.message })
+    }
+}
+
+module.exports = { pagination, getProfileResto, getListResto, addCategory, getcategory, editCategory, delCategory, addResto, editResto, deleteResto }
