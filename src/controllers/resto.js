@@ -1,5 +1,6 @@
 const user = require('../models/resto')
 var bcrypt = require('bcryptjs')
+const { authmiddleware } = require('../middleware/authmiddleware')
 var salt = bcrypt.genSaltSync(10);
 const qs = require('qs')
 
@@ -76,6 +77,59 @@ const getResto = async(req, res) => {
     }
 }
 
+//Search list customer who order
+const getlistOrder = async(req, res) => {
+    console.log(req.auth)
+    const { id } = req.params
+    const detail = await user.order(id)
+    if (detail) {
+        res.send({
+            success: true,
+            data: detail,
+            total: detail.length
+        })
+    } else {
+        res.send({
+            success: false,
+            data: detail
+        })
+    }
+}
+
+//Add Category
+const addCategory = async(req, res) => {
+    const { category } = req.body
+    try {
+        const create = await user.addcategor(category)
+        if (create) {
+            res.send({ success: true, msg: 'New category successfully added' })
+        } else {
+            res.send({ success: false, msg: 'Failed to add ' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: error })
+    }
+}
+
+//Search list category item
+const getcategory = async(req, res) => {
+    const { id } = req.params
+    const detail = await user.category(id)
+    if (detail) {
+        res.send({
+            success: true,
+            data: detail,
+            total: detail.length
+        })
+    } else {
+        res.send({
+            success: false,
+            data: detail
+        })
+    }
+}
+
+//Add resto
 const addResto = async(req, res) => {
     const { name_restaurant, logo, location, description, created_by } = req.body
     try {
@@ -90,7 +144,7 @@ const addResto = async(req, res) => {
     }
 }
 
-
+//edit restaurant
 const editResto = async(req, res) => {
     const { id } = req.params
     const key = Object.keys(req.body)
@@ -118,8 +172,7 @@ const editResto = async(req, res) => {
     }
 }
 
-
-
+//Delete Restaurant
 const deleteResto = async(req, res) => {
     const { id } = req.body
     const del = await user.delete(id)
@@ -130,4 +183,4 @@ const deleteResto = async(req, res) => {
     }
 }
 
-module.exports = { pagination, getResto, addResto, editResto, deleteResto }
+module.exports = { pagination, getlistOrder, addCategory, getcategory, getResto, addResto, editResto, deleteResto }

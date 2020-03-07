@@ -16,6 +16,7 @@ function checktoken(req, res, next) {
     //checking kevalidan jwt
     try {
         req.auth = jwt.verify(token, process.env.APP_KEY)
+        console.log(req.auth)
         next()
     } catch (error) {
         res.send({

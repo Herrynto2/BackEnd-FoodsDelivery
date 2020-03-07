@@ -16,10 +16,10 @@ const { auth } = require('./src/routes/auth')
 const { checktoken } = require('./src/middleware/authmiddleware')
 
 app.use('/migrate', migration)
-app.use('/auth', auth)
-app.use('/items', checktoken, user)
-app.use('/restaurant', checktoken, users)
-app.use('/', checktoken, transaction)
+app.use('/', auth)
+app.use('/', user)
+app.use('/', users)
+app.use('/', transaction)
 
 //Define Port Server
 app.listen(3000, () => {

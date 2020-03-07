@@ -1,21 +1,12 @@
 const user = require('express').Router
 const app = user()
-const { pagination, getItems, addItem, editItem, deleteItem } = require('../controllers/items')
+const { pagination, getItems, addItem, editItem, deleteItem, addCategory } = require('../controllers/items')
 
-//SELECT ALL data user
 app.get('/', pagination);
-
-//Select Items
 app.get('/:id', getItems);
 app.get('/', getItems);
-
-//Add Items
-app.post("/", addItem);
-
-//Edit Items
-app.patch("/:id", editItem);
-
-//Delete Items
-app.delete("/", deleteItem);
+app.post("/user/restaurant/items", addItem); //Add item : Admin
+app.patch("/user/restaurant/items/:id", editItem); //Edit Item : Admin
+app.delete("/user/restaurant/items/delete", deleteItem); //Delete item : Admin
 
 module.exports = { user: app }

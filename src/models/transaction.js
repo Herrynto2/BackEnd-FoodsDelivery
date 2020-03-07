@@ -2,10 +2,10 @@ const { conn } = require('../config/db')
 const { dates, time } = require('./time')
 
 module.exports = {
-        //Topup
+        //Topup balance
         update: (id, params) => {
                 return new Promise((resolve, reject) => {
-                            conn.query(`SELECT Saldo from userdetail where id = ${id}`,
+                            conn.query(`SELECT Saldo from userdetail where id_user = ${id}`,
                                     (error, results, fields) => {
                                         console.log(results[0].Saldo)
                                         if (!error) {
@@ -13,7 +13,7 @@ module.exports = {
                                             if (total === 0) {
                                                 resolve(false)
                                             } else {
-                                                conn.query(`UPDATE userdetail set ${params.map(v => `${v.keys} = '${v.value}'`)}+${results[0].Saldo}  WHERE id = ${id}`,
+                                                conn.query(`UPDATE userdetail set ${params.map(v => `${v.keys} = '${v.value}'`)}+${results[0].Saldo}  WHERE id_user = ${id}`,
                                 (error, results, fields) => {
                                     console.log(params[0].value)
                                     if (error) {
@@ -29,17 +29,19 @@ module.exports = {
         })
     },
     //Delete Items
-    delete: (id) => {
+    delete: (id, params) => {
         return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from cart where id = ${id}`,
+            conn.query(`SELECT COUNT(*) AS total from cart where id_user = ${id}`,
                 (error, results, fields) => {
+                    console.log()
                     if (!error) {
                         const { total } = results[0]
                         if (total === 0) {
                             resolve(false)
                         } else {
-                            conn.query(`DELETE FROM cart where id = ${id}`,
+                            conn.query(`DELETE FROM cart WHERE id_item = ${params[0].value} && id_user = ${id}`,
                                 (error, results, fields) => {
+
                                     if (error) {
                                         reject(new Error(error))
                                     }
@@ -55,14 +57,14 @@ module.exports = {
     //Save item in cart
     create: (id) => {
         return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from foodsdata where id = ${id}`,
+            conn.query(`SELECT COUNT(*) AS total from foodsdata where id_item = ${id}`,
                 (error, results, fields) => {
                     if (!error) {
                         const { total } = results[0]
                         if (total === 0) {
                             resolve(false)
-                        } else {
-                            conn.query(`Insert into cart (id_restaurant, name, price, description, images) select id_restaurant, name, price, description, images from foodsdata where id = ${id}`,
+                        } else {    
+                            conn.query(`Insert into cart (id_restaurant, name, price, description, images) select id_restaurant, name_item, price, description, images from foodsdata where id_item = ${id}`,
                                 (error, results, fields) => {
                                     if (error) {
                                         reject(new Error(error))
@@ -76,7 +78,7 @@ module.exports = {
                 })
         })
     },
-    //Check item as user
+    //Check user items in cart 
     get: (id, params) => {
         if (id) {
             return new Promise((resolve, reject) => {
@@ -86,29 +88,61 @@ module.exports = {
                     resolve(results)
                 })
             })
-        } else {
-            return new Promise((resolve, reject) => {
-                conn.query(`SELECT * FROM cart`, (error, results, fields) => {
-                    if (error) reject(new Error(error))
-                    resolve(results)
-                })
-            })
         }
-    },
-    //Check item where id
-    gets: (id) => {
-        if (id) {
-            return new Promise((resolve, reject) => {
-                console.log(id)
-                conn.query(`SELECT * FROM cart where id = ${id}`, (error, results, fields) => {
-                    if (error) reject(new Error(error))
-                    resolve(results)
+    }, 
+    //Give Review Items
+    postReview: (id, params) => {
+        return new Promise((resolve, reject) => {
+            conn.query(`SELECT COUNT(*) AS total from foodsdata where id_item = ${parseInt(params[1].value)}`,
+                (error, results, fields) => {
+                    console.log(parseInt(params[1].value))
+                    if (!error) {
+                        const { total } = results[0]
+                        if (total === 0) {
+                            resolve(false)
+                        } else {
+                            conn.query(`INSERT INTO foodsreview (id_user, id_restaurant, id_item, review, rating) VALUES (${id}, ${parseInt(params[0].value)}, ${parseInt(params[1].value)}, '${params[2].value}' ,'${parseInt(params[3].value)}')`,
+                                (error, results, fields) => {
+
+                                    if (error) {
+                                        reject(new Error(error))
+                                    }
+                                    resolve(true)
+                                })
+                        }
+                    } else {
+                        reject(new Error(error))
+                    }
                 })
-            })
-        } 
-    },
-    //select cart.price, userdetail.Saldo from cart join userdetail on cart.id_user=userdetail.id where cart.id = 1
-    //Checkout
+        })
+    }, 
+    //Edit Review Items
+    patchReview: (id, params) => {
+        return new Promise((resolve, reject) => {
+            conn.query(`SELECT COUNT(*) AS total from foodsreview where id_user = ${id} && id_item = ${parseInt(params[1].value)}`,
+                (error, results, fields) => {
+                    console.log(parseInt(params[1].value))
+                    if (!error) {
+                        const { total } = results[0]
+                        if (total === 0) {
+                            resolve(false)
+                        } else {
+                            conn.query(`UPDATE foodsreview set ${params.map(v => `${v.keys} = '${v.value}'`)}+${results[0].Saldo}  WHERE id_item = ${params[1].value}`,
+                                (error, results, fields) => {
+
+                                    if (error) {
+                                        reject(new Error(error))
+                                    }
+                                    resolve(true)
+                                })
+                        }
+                    } else {
+                        reject(new Error(error))
+                    }
+                })
+        })
+    }, 
+   //Checkout
     checkout: (id) => {
         return new Promise((resolve, reject) => {
             conn.query(`select cart.price, userdetail.Saldo from cart join userdetail on cart.id_user=userdetail.id where cart.id = ${id}`,

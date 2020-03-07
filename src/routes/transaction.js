@@ -1,24 +1,19 @@
 //Import express
 const user = require('express').Router
 const app = user()
-const { topUp, saveCart, delItem, checkItem, checkItems, checkOutItem } = require('../controllers/transaction')
+const { topUp, saveCart, delItem, checkItem, checkOutItem, addReview } = require('../controllers/transaction')
+const { checktoken } = require('../middleware/authmiddleware')
 
-//Save items to Cart
-app.post("/savecart", saveCart);
+app.patch("/topup/:id", checktoken, topUp); //User General : Top Up
+app.post("/carts/items", checktoken, saveCart); //User General : Save items to Cart
+app.get("/carts/:id", checktoken, checkItem); //User General : Check lits item in the cart
+app.delete("/carts/delete/:id", checktoken, delItem); //User General : Delete Items
+app.post("/review/:id", checktoken, addReview); //User General : Give Review item
+app.get("/review/:id", checktoken, addReview); //User General : Give Review item
 
-//Top Up
-app.patch("/topup/:id", topUp);
-
-//Delete Item in cart
-app.delete("/delete", delItem);
-
-//Check Item in cart
-app.get("/cart", checkItems);
-app.get("/cart", checkItem);
-app.get("/cart/:id", checkItem);
 
 //Checkout
-app.get("/checkout", checkOutItem);
+app.get("/user/checkout", checkOutItem);
 
 
 

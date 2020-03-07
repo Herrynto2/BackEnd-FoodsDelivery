@@ -74,7 +74,6 @@ module.exports = {
                 })
         })
     },
-    
     get: (id, params) => {
         //List Food from a Resto
         if (id) {
@@ -95,7 +94,68 @@ module.exports = {
             })
         }
     },
-    
+    //get list order
+    getorder : (id, params) => {
+        if (id) {
+            return new Promise((resolve, reject) => {
+                console.log(id)
+                conn.query(`SELECT name_user, name_item, total, total_price, date_created FROM transaction WHERE id_user = ${id}`, (error, results, fields) => {
+                    if (error) reject(new Error(error))
+                    resolve(results)
+                })
+            })
+        } else {
+            return new Promise((resolve, reject) => {
+                conn.query(`SELECT name_user, name_item, total, total_price, date_created FROM transaction`, (error, results, fields) => {
+                    if (error) reject(new Error(error))
+                    resolve(results)
+                })
+            })
+        }
+    },
+    //Create Resto
+    addcategor: (category) => {
+        return new Promise((resolve, reject) => {
+            conn.query(`SELECT COUNT(*) AS total from categories where category = '${category}' LIMIT 1`,
+                (error, results, fields) => {
+                    if (!error) {
+                        const { total } = results[0]
+                        if (total !== 0) {
+                            resolve(false)
+                        } else {
+                            conn.query(`INSERT INTO categories(category) VALUES ('${category}')`,
+                                (error, results, fields) => {
+                                    if (error) {
+                                        reject(new Error(error))
+                                    }
+                                    resolve(true)
+                                })
+                        }
+                    } else {
+                        reject(new Error(error))
+                    }
+                })
+        })
+    },
+    //get list category
+    category: (id, params) => {
+        if (id) {
+            return new Promise((resolve, reject) => {
+                console.log(id)
+                conn.query(`select categories.category, foodsdata.name_item, foodsdata.price, foodsdata.description, foodsdata.images FROM foodsdata foodsdata JOIN categories ON categories.category = foodsdata.category  WHERE categories.id_category  = ${id}`, (error, results, fields) => {
+                    if (error) reject(new Error(error))
+                    resolve(results)
+                })
+            })
+        } else {
+            return new Promise((resolve, reject) => {
+                conn.query(`select categories.category, foodsdata.name_item, foodsdata.price, foodsdata.description, foodsdata.images FROM foodsdata categories JOIN foodsdata ON categories.category = foodsdata.category`, (error, results, fields) => {
+                    if (error) reject(new Error(error))
+                    resolve(results)
+                })
+            })
+        }
+    },
     search: (id, params) => {
                 //Command Detail GET 
                 if (id) {
