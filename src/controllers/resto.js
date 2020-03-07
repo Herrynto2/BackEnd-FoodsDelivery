@@ -59,27 +59,143 @@ const pagination = async(req, res) => {
     })
 }
 
-//List Restaurant
-const getResto = async(req, res) => {
+//Profile Restaurant
+const getProfileResto = async(req, res) => {
     const { id } = req.params
-    const detail = await user.get(id)
-    if (detail) {
-        res.send({
-            success: true,
-            data: detail,
-            total: detail.length
-        })
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'id_restaurant')) {
+            console.log(key[i])
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const detail = await user.getProfile(id, params)
+            if (detail) {
+                res.send({ success: true, msg: detail })
+            } else {
+                res.send({ success: false, msg: 'Restaurant not found' })
+            }
+        } else {
+
+        }
+    } catch (error) {
+        res.send({ success: false, message: "Unvalid id" })
+    }
+}
+
+//List Restaurant
+const getListResto = async(req, res) => {
+    const { id } = req.params
+    if (parseInt(id) === parseInt(req.auth.id)) {
+        const detail = await user.get(id)
+        console.log(detail)
+        if (detail) {
+            res.send({
+                success: true,
+                data: detail
+            })
+        } else {
+            res.send({
+                success: false,
+                data: detail
+            })
+        }
     } else {
         res.send({
             success: false,
-            data: detail
+            message: "Unvalid id"
         })
+    }
+}
+
+//Add restaurant
+const addResto = async(req, res) => {
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'name_restaurant' || key[i] === 'logo' || key[i] === 'location' || key[i] === 'description' || key[i] === 'created_by')) {
+            console.log(key[i])
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+    }).filter(o => o)
+    try {
+        // console.log(req.auth.id)
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const detail = await user.create(id, params)
+            console.log(detail)
+            if (detail) {
+                res.send({ success: true, msg: 'Restaurant successfully created' })
+            } else {
+                res.send({ success: false, msg: 'User can only have maximal 2 restaurant in one account' })
+            }
+        } else {
+            res.send({ success: false, message: "Unvalid id" })
+        }
+    } catch (error) {
+        res.send({ success: false, message: error.message })
+    }
+}
+
+//edit restaurant
+const editResto = async(req, res) => {
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'id_restaurant' || key[i] === 'name_restaurant' || key[i] === 'logo' || key[i] === 'location' || key[i] === 'description' || key[i] === 'created_by')) {
+            console.log(key[i])
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const update = await user.update(id, params)
+            if (update) {
+                res.send({ success: true, msg: `restaurant id ${id} has been updated` })
+            } else {
+                res.send({ success: false, msg: 'Failed to update Restaurant' })
+            }
+        } else {
+            res.send({ success: false, msg: 'Invalid id user' })
+        }
+
+    } catch (error) {
+        res.send({ success: false, msg: 'Error' })
+    }
+}
+
+//Delete Restaurant
+const deleteResto = async(req, res) => {
+    const { id } = req.body
+    const del = await user.delete(id)
+    if (del) {
+        res.send({ success: true, Message: `delete ID :${id} success` })
+    } else {
+        res.send({ success: false, Message: 'delete failed' })
     }
 }
 
 //Search list customer who order
 const getlistOrder = async(req, res) => {
-    console.log(req.auth)
     const { id } = req.params
     const detail = await user.order(id)
     if (detail) {
@@ -98,16 +214,33 @@ const getlistOrder = async(req, res) => {
 
 //Add Category
 const addCategory = async(req, res) => {
-    const { category } = req.body
-    try {
-        const create = await user.addcategor(category)
-        if (create) {
-            res.send({ success: true, msg: 'New category successfully added' })
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'id_restaurant' || key[i] === 'category')) {
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
         } else {
-            res.send({ success: false, msg: 'Failed to add ' })
+            return null
         }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const update = await user.addcategor(id, params)
+            if (update) {
+                res.send({ success: true, msg: `Category successfully added` })
+            } else {
+                res.send({ success: false, msg: 'Category has been available' })
+            }
+        } else {
+            res.send({ success: false, msg: 'Invalid id user' })
+        }
+
     } catch (error) {
-        res.send({ success: false, msg: error })
+        res.send({ success: false, msg: error.message })
     }
 }
 
@@ -129,58 +262,4 @@ const getcategory = async(req, res) => {
     }
 }
 
-//Add resto
-const addResto = async(req, res) => {
-    const { name_restaurant, logo, location, description, created_by } = req.body
-    try {
-        const create = await user.create(name_restaurant, logo, location, description, created_by)
-        if (create) {
-            res.send({ success: true, msg: 'User has been created' })
-        } else {
-            res.send({ success: false, msg: 'Failed to create user' })
-        }
-    } catch (error) {
-        res.send({ success: false, msg: error })
-    }
-}
-
-//edit restaurant
-const editResto = async(req, res) => {
-    const { id } = req.params
-    const key = Object.keys(req.body)
-    const params = key.map((v, i) => {
-        if (v && (key[i] === 'name_restaurant' || key[i] === 'logo' || key[i] === 'location' || key[i] === 'description' || key[i] === 'created_by')) {
-            console.log(key[i])
-            if (req.body[key[i]]) {
-                return { keys: key[i], value: req.body[key[i]] }
-            } else {
-                return null
-            }
-        } else {
-            return null
-        }
-    }).filter(o => o)
-    try {
-        const update = await user.update(id, params)
-        if (update) {
-            res.send({ success: true, msg: `restaurant id ${id} has been updated` })
-        } else {
-            res.send({ success: false, msg: 'Failed to update Restaurant' })
-        }
-    } catch (error) {
-        res.send({ success: false, msg: 'Error' })
-    }
-}
-
-//Delete Restaurant
-const deleteResto = async(req, res) => {
-    const { id } = req.body
-    const del = await user.delete(id)
-    if (del) {
-        res.send({ success: true, Message: `delete ID :${id} success` })
-    } else {
-        res.send({ success: false, Message: 'delete failed' })
-    }
-}
-
-module.exports = { pagination, getlistOrder, addCategory, getcategory, getResto, addResto, editResto, deleteResto }
+module.exports = { pagination, getProfileResto, getListResto, getlistOrder, addCategory, getcategory, addResto, editResto, deleteResto }

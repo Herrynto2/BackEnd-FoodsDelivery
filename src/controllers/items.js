@@ -165,14 +165,4 @@ const deleteItem = async(req, res) => {
     }
 }
 
-// const deleteItem = async(req, res) => {
-//     const { id } = req.body
-//     const del = await user.delete(id)
-//     if (del) {
-//         res.send({ success: true, Message: `delete ID :${id} success` })
-//     } else {
-//         res.send({ success: false, Message: 'delete failed' })
-//     }
-// }
-
 module.exports = { pagination, getItems, addItem, editItem, deleteItem }

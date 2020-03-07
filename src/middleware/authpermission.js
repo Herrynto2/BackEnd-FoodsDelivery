@@ -34,7 +34,7 @@ module.exports = {
 const checkPermission = (auth, role) => {
     return new Promise((resolve, reject) => {
         if (auth) {
-            connquery(`SELECT is_${role}${role === 'admin' ? ',is_superadmin' : ''} FROM users WHERE username='${auth.username}'`,
+            connquery(`SELECT is_${role}${role === 'is_admin' ? ',is_superadmin' : ''} FROM users WHERE username='${auth.username}'`,
                 (err, results, fields) => {
                     if (err || !(results[1].length > 0)) {
                         console.log(err)

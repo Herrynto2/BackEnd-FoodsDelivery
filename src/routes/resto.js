@@ -1,20 +1,21 @@
 //Import express
 const user = require('express').Router
 const { checktoken } = require('../middleware/authmiddleware')
+const checkPermission = require('../middleware/authpermission')
 const app = user()
-const { pagination, getResto, addCategory, getlistOrder, getcategory, addResto, editResto, deleteResto } = require('../controllers/resto')
+const { getProfileResto, getListResto, addResto, editResto, deleteResto, addCategory, getlistOrder, getcategory } = require('../controllers/resto')
 
-app.get('/', getResto);
-app.get('/:id', getResto);
 app.get('/user/restaurant/order', getlistOrder); //search list order
 app.get('/user/restaurant/order/:id', getlistOrder); //search list order
 app.get('/user/restaurant/categories', getcategory); //search list order
-app.post('/admin/categories', checktoken, addCategory); //add category item : Superadmin
-app.get('/user/restaurant/categories/:id', getcategory); //search list order
-app.post('/user/restaurant', addResto); //create restaurant : Admin
-app.patch('/user/restaurant/:id', checktoken, editResto); //Edit restaurant : Admin
-app.delete("/admin/deleterestaurant", deleteResto); //delete restaurant : Superadmin
 
-
+//
+app.delete('/restaurant', checktoken, checkPermission.superadmin, deleteResto); //Superadmin : delete restaurant
+app.post('/restaurant/:id', checktoken, addResto); //create restaurant : Admin
+app.get('/restaurant/:id', checktoken, getListResto); //Admin : Check list restaurant 
+app.get('/restaurant/profile/:id', checktoken, getProfileResto); //Admin : Check profile restaurant 
+app.patch('/restaurant/:id', checktoken, editResto); //Admin : Edit Resto
+app.post('/categories/:id', checktoken, addCategory); //admin : add category item 
+app.get('/categories', checktoken, getcategory);
 
 module.exports = { users: app }
