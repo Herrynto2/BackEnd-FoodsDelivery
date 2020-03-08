@@ -36,30 +36,34 @@
 <hr>
 <ul>
     <ul>
-        <p>1. Authentication</p>
+        <h6>1. Authentication</h6>
         <li>(POST) /login</li>
         <li>(POST) /register</li>
         <li>(PATCH) /forgot-password</li>
     </ul>
+    <p></p>
     <ul>
-        <p>2. Super admin</p>
+        <h6>2. Super admin</h6>
         <li>(DELETE) /profile</li>
         <li>(DELETE) /restaurant</li>
     </ul>
+    <p></p>
     <ul>
-        <p>3. Admin</p>
+        <h6>3. Admin</h6>
         <li>(CRUD) /items</li>
         <li>(CRUD) /restaurant</li>
         <li>(CRUD) /category</li>
     </ul>
+    <p></p>
     <ul>
-        <p>4. General User</p>
+        <h6>4. General User</h6>
         <li>(CRUD) /profile</li>
         <li>(CRUD) /carts</li>
         <li>(CRUD) /reviews</li>
     </ul>
+    <p></p>
     <ul>
-        <p>5. Guest</p>
+        <h6>5. Guest</h6>
         <li>(GET) /Browse-items</li>
         <li>(GET) /Browse-restaurants</li>
         <li>(GET) /Browse-category</li>
