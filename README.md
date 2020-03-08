@@ -5,8 +5,8 @@
 <h3>Built with</h3>
 <hr>
 <ul>
-    <li>Node JS</li>
-    <li>Express JS</li>
+    <li><a href="">Node JS</a></li>
+    <li><a href="">Express JS</a></li>
 </ul>
 
 <h3>Requirements</h3>
@@ -17,3 +17,9 @@
     <li><a href="">Visual Studio Code Editor</a></li>
     <li><a href="">XAMPP Web Server</a></li>
 </ul>
+
+<h3>Using this App</h3>
+<div>
+    <p>1. Open the application with a terminal or CMD</p>
+    <p>2. Install npm (install npm)</p>
+</div>
