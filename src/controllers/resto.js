@@ -227,6 +227,38 @@ const addCategory = async(req, res) => {
     }
 }
 
+//Add Categoryid
+const addCategoryid = async(req, res) => {
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'category')) {
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const update = await user.addcategorid(id, params)
+            if (update) {
+                res.send({ success: true, msg: `Category successfully added` })
+            } else {
+                res.send({ success: false, msg: 'Category has been available' })
+            }
+        } else {
+            res.send({ success: false, msg: 'Invalid id user' })
+        }
+
+    } catch (error) {
+        res.send({ success: false, msg: error.message })
+    }
+}
+
 
 const editCategory = async(req, res) => {
     const { id } = req.params
@@ -308,4 +340,4 @@ const delCategory = async(req, res) => {
     }
 }
 
-module.exports = { pagination, getProfileResto, getListResto, addCategory, getcategory, editCategory, delCategory, addResto, editResto, deleteResto }
+module.exports = { pagination, getProfileResto, getListResto, addCategory, addCategoryid, getcategory, editCategory, delCategory, addResto, editResto, deleteResto }

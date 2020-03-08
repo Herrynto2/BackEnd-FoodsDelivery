@@ -40,7 +40,6 @@ module.exports = {
             return new Promise((resolve, reject) => {
                 connquery(`SELECT id_user from users WHERE verification_code= '${code}'`,
                     (err, results, fields) => {
-                        console.log(err)
                         if (!err) {
                             if (results[1][0] && results[1][0].id_user) {
                                 const idUser = results[1][0].id_user

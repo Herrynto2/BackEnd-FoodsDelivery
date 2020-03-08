@@ -124,6 +124,32 @@ module.exports = {
                     }
                 })
         })
+    }, 
+    //Add Categories
+    addcategorid: (id, params) => {
+        return new Promise((resolve, reject) => {
+            conn.query(`SELECT COUNT(*) AS total from categories_id where category = '${params[1].value}' LIMIT 1`,
+                (error, results, fields) => {
+                    console.log(params[1].value)
+                    if (!error) {
+                        const { total } = results[0]
+                        console.log(total)
+                        if (total === 1) {
+                            resolve(false)
+                        } else {
+                            conn.query(`INSERT INTO categories_id(category) VALUES ('${params[1].value}')`,
+                                (error, results, fields) => {
+                                    if (error) {
+                                        reject(new Error(error))
+                                    }
+                                    resolve(true)
+                                })
+                        }
+                    } else {
+                        reject(new Error(error))
+                    }
+                })
+        })
     },
     //Edit Categories
     editcategor: (id, params) => {

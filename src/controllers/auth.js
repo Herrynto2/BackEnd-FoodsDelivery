@@ -67,7 +67,6 @@ const Verify = async(req, res, next) => {
     try {
         if (!req.query.code) {
             throw new Error('Required Query code')
-            console.log(req.query.code)
         }
         const verify = await user.verifyUser(req.query.code)
 
@@ -80,7 +79,6 @@ const Verify = async(req, res, next) => {
             throw new Error('Failed to Verify Your Account')
         }
     } catch (e) {
-        console.log(e)
         res.status(202).send({
             success: false,
             msg: e.message
