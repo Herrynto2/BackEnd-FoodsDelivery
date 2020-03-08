@@ -2,13 +2,10 @@ const { conn } = require('../config/db')
 const { dates, time } = require('./time')
 
 module.exports = {
-        //SELECT restodata.id_restaurant, restodata.name_restaurant, restodata.location, restodata.created_by, foodsdata.name_item, foodsdata.price, foodsdata.images FROM restodata JOIN foodsdata ON restodata.id_restaurant=foodsdata.id_restaurant WHERE restodata.id_restaurant = ${id}
-
         //List Restaurant
         get: (id, params) => {
             if (id) {
                 return new Promise((resolve, reject) => {
-                    console.log(id)
                     conn.query(`SELECT * from restodata where id_user = ${id}`, (error, results, fields) => {
                         if (error) reject(new Error(error))
                         resolve(results)
@@ -39,7 +36,7 @@ module.exports = {
                             if (total === 2) {
                                 resolve(false)
                             } else {
-                                conn.query(`INSERT INTO restodata(name_restaurant, id_user, logo, location, description, created_by) VALUES ('${params[0].value}', ${id}, '${params[1].value}', '${params[2].value}', '${params[3].value}', '${params[4].value}')`,
+                                conn.query(`INSERT INTO restodata(name_restaurant, id_user, logo, location, description, created_by, date_created) VALUES ('${params[0].value}', ${id}, '${params[1].value}', '${params[2].value}', '${params[3].value}', '${params[4].value}','${dates()}');UPDATE users SET is_admin = ${true} where id_user = ${id}`,
                                     (error, results, fields) => {
                                         if (error) {
                                             reject(new Error(error))
@@ -159,7 +156,7 @@ module.exports = {
         if (id) {
             return new Promise((resolve, reject) => {
                 console.log(id)
-                conn.query(`select categories.category, foodsdata.name_item, foodsdata.price, foodsdata.description, foodsdata.images FROM foodsdata foodsdata JOIN categories ON categories.category = foodsdata.category  WHERE categories.id_category  = ${id}`, (error, results, fields) => {
+                conn.query(`select categories.category FROM categories JOIN restodata ON categories.id_restaurant = restodata.id_restaurant  WHERE restodata.id_user  = ${id}`, (error, results, fields) => {
                     if (error) reject(new Error(error))
                     resolve(results)
                 })

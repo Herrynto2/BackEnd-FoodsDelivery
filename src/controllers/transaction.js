@@ -68,23 +68,32 @@ const delItem = async(req, res) => {
 
 //Save items 
 const saveCart = async(req, res) => {
-    const { id } = req.body
-    try {
-        // if (parseInt(id) === parseInt(req.auth.id)) {
-        const create = await user.create(id)
-        if (create) {
-            res.send({ success: true, Message: `Item with id : ${id} success to save in a cart` })
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'id_item')) {
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
         } else {
-            res.send({ success: false, Message: 'failed to save in a cart' })
+            return null
         }
-        // } else {
-        //     res.send({
-        //         success: false,
-        //         message: 'Invalid user'
-        //     })
-        // }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const save = await user.create(id, params)
+            if (save) {
+                res.send({ success: true, msg: `Save item success` })
+            } else {
+                res.send({ success: false, msg: 'Failed to save item' })
+            }
+        } else {
+            res.send({ success: false, msg: 'Invalid user id' })
+        }
     } catch (error) {
-        res.send({ success: false, msg: error })
+        res.send({ success: false, msg: error.message })
     }
 }
 
@@ -116,17 +125,32 @@ const checkItem = async(req, res) => {
 
 //Checkout
 const checkOutItem = async(req, res) => {
-    const { id } = req.body
-    console.log(id)
-    try {
-        const check = await user.checkout(id)
-        if (check) {
-            res.send({ success: check, msg: `success` })
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'id_item' || key[i] === 'total')) {
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
         } else {
-            res.send({ success: false, msg: 'Failed' })
+            return null
+        }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const check = await user.checkout(id, params)
+            if (check) {
+                res.send({ success: true, msg: `checkout success` })
+            } else {
+                res.send({ success: false, msg: 'Failed to checkout' })
+            }
+        } else {
+            res.send({ success: false, msg: 'Invalid user id' })
         }
     } catch (error) {
-        res.send({ success: false, msg: error })
+        res.send({ success: false, msg: error.message })
     }
 }
 

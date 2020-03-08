@@ -12,7 +12,9 @@ const login = async(req, res, next) => {
             const dataLogin = await new Promise((resolve, reject) => {
                 connquery(`SELECT * FROM users WHERE username='${username}' || password='${password}'`,
                     (err, results) => {
-                        if (!err && results[1].length > 0 && bcrypt.compareSync(password, results[1][0].password)) {
+                        if (results[1][0].is_verified === 0) {
+                            reject(new Error(err || 'Please verified your account first'))
+                        } else if (!err && results[1].length > 0 && bcrypt.compareSync(password, results[1][0].password)) {
                             const userData = { username, id: results[1][0].id_user }
                             resolve(userData)
                         } else {
@@ -50,7 +52,7 @@ const regist = async(req, res) => {
             if (create) {
                 res.send({ success: true, msg: 'Registration success', Verification_codes: create })
             } else {
-                res.send({ success: false, msg: 'Failed to registration' })
+                res.send({ success: false, msg: 'Character lenght must be 6-15' })
             }
         } else {
             res.send({ success: false, msg: 'Failed to registration' })
@@ -61,30 +63,28 @@ const regist = async(req, res) => {
 }
 
 //Registration Verify
-const regVerify = async(req, res) => {
-    const { id } = req.params
-    const key = Object.keys(req.body)
-    const params = key.map((v, i) => {
-        if (v && (key[i] === 'is_verified' || key[i] === 'verification_code')) {
-            console.log(key[i])
-            if (req.body[key[i]]) {
-                return { keys: key[i], value: req.body[key[i]] }
-            } else {
-                return null
-            }
-        } else {
-            return null
-        }
-    }).filter(o => o)
+const Verify = async(req, res, next) => {
     try {
-        const update = await user.verifyreg(id, params)
-        if (update) {
-            res.send({ success: true, msg: `verify success` })
-        } else {
-            res.send({ success: false, msg: 'Failed success' })
+        if (!req.query.code) {
+            throw new Error('Required Query code')
+            console.log(req.query.code)
         }
-    } catch (error) {
-        res.send({ success: false, msg: 'Error' })
+        const verify = await user.verifyUser(req.query.code)
+
+        if (verify) {
+            res.status(200).send({
+                success: true,
+                msg: 'Your Account successfully verified'
+            })
+        } else {
+            throw new Error('Failed to Verify Your Account')
+        }
+    } catch (e) {
+        console.log(e)
+        res.status(202).send({
+            success: false,
+            msg: e.message
+        })
     }
 }
 
@@ -169,17 +169,14 @@ const changeProfile = async(req, res) => {
 //Delete Profile User
 const delProfile = async(req, res) => {
     const { id } = req.body
-    if (parseInt(id) === parseInt(req.auth.id)) {
-        const del = await user.delete(id)
-        if (del) {
-            res.send({ success: true, Message: `delete ID :${id} success` })
-        } else {
-            res.send({ success: false, Message: 'delete failed' })
-        }
+    const del = await user.delete(id)
+    if (del) {
+        res.send({ success: true, Message: `delete ID :${id} success` })
     } else {
-        res.send({ success: false, msg: 'User id is unvalid' })
+        res.send({ success: false, Message: 'delete failed' })
     }
 }
 
 
-module.exports = { login, regist, regVerify, forgotPass, changeProfile, delProfile, getProfile }
+
+module.exports = { login, regist, Verify, forgotPass, changeProfile, delProfile, getProfile }

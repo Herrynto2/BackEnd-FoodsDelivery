@@ -60,6 +60,7 @@ const getItems = async(req, res) => {
     const { id } = req.params
     if (parseInt(id) === parseInt(req.auth.id)) {
         const detail = await user.get(id)
+        console.log(detail)
         if (detail) {
             res.send({
                 success: true,
@@ -83,7 +84,7 @@ const addItem = async(req, res) => {
     const { id } = req.params
     const key = Object.keys(req.body)
     const params = key.map((v, i) => {
-        if (v && (key[i] === 'id_restaurant' || key[i] === 'category' || key[i] === 'name_item' || key[i] === 'price' || key[i] === 'description' || key[i] === 'images')) {
+        if (v && (key[i] === 'id_restaurant' || key[i] === 'category' || key[i] === 'name_item' || key[i] === 'price' || key[i] === 'description' || key[i] === 'images' || key[i] === 'total_item')) {
             if (req.body[key[i]]) {
                 return { keys: key[i], value: req.body[key[i]] }
             } else {
@@ -105,7 +106,37 @@ const addItem = async(req, res) => {
             res.send({ success: false, msg: 'Invalid User' })
         }
     } catch (error) {
-        res.send({ success: false, msg: 'Error' })
+        res.send({ success: false, msg: error.message })
+    }
+}
+
+const addtotal = async(req, res) => {
+    const { id } = req.params
+    const key = Object.keys(req.body)
+    const params = key.map((v, i) => {
+        if (v && (key[i] === 'id_item' || key[i] === 'total_item')) {
+            if (req.body[key[i]]) {
+                return { keys: key[i], value: req.body[key[i]] }
+            } else {
+                return null
+            }
+        } else {
+            return null
+        }
+    }).filter(o => o)
+    try {
+        if (parseInt(id) === parseInt(req.auth.id)) {
+            const add = await user.value(id, params)
+            if (add) {
+                res.send({ success: true, msg: `total item successfully added` })
+            } else {
+                res.send({ success: false, msg: 'Failed to add' })
+            }
+        } else {
+            res.send({ success: false, msg: 'Invalid User' })
+        }
+    } catch (error) {
+        res.send({ success: false, msg: error.message })
     }
 }
 
@@ -113,7 +144,7 @@ const editItem = async(req, res) => {
     const { id } = req.params
     const key = Object.keys(req.body)
     const params = key.map((v, i) => {
-        if (v && (key[i] === 'id_restaurant' || key[i] === 'id_item' || key[i] === 'category' || key[i] === 'name_item' || key[i] === 'price' || key[i] === 'description' || key[i] === 'images')) {
+        if (v && (key[i] === 'id_restaurant' || key[i] === 'id_item' || key[i] === 'category' || key[i] === 'name_item' || key[i] === 'price' || key[i] === 'description' || key[i] === 'images' || key[i] === 'total_item')) {
             if (req.body[key[i]]) {
                 return { keys: key[i], value: req.body[key[i]] }
             } else {
@@ -131,7 +162,7 @@ const editItem = async(req, res) => {
             res.send({ success: false, msg: 'Failed to update user' })
         }
     } catch (error) {
-        res.send({ success: false, msg: 'Error' })
+        res.send({ success: false, msg: error.message })
     }
 }
 
@@ -247,7 +278,13 @@ const listReview = async(req, res) => {
             const detail = await user.getReview(id, params)
             console.log(detail)
             if (detail) {
-                res.send({ success: true, name_item: detail[0].name_item, detail: detail })
+                res.send({
+                    success: true,
+                    id_restaurant: detail[0].id_restaurant,
+                    name_item: detail[0].name_item,
+                    Review: detail.map(e => [`id_user: ${e.id_user}`, `Review: ${e.review}`, `Rating: ${e.rating}`, `date_created: ${e.date_created}`])
+                })
+
             } else {
                 res.send({ success: false, msg: 'item not found' })
             }
@@ -290,4 +327,4 @@ const deleteReview = async(req, res) => {
     }
 }
 
-module.exports = { pagination, getItems, addItem, editItem, deleteItem, addReview, editReview, listReview, deleteReview }
+module.exports = { pagination, getItems, addItem, editItem, deleteItem, addReview, editReview, listReview, deleteReview, addtotal }

@@ -227,6 +227,7 @@ const addCategory = async(req, res) => {
     }
 }
 
+
 const editCategory = async(req, res) => {
     const { id } = req.params
     const key = Object.keys(req.body)

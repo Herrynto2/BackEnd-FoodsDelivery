@@ -25,7 +25,7 @@ module.exports = {
                             if (total === 0) {
                                 resolve(false)
                             } else {
-                                conn.query(`INSERT INTO foodsdata(id_restaurant, category, name_item, price, description, images, date_created, date_updated) VALUES ('${params[0].value}','${params[1].value}','${params[2].value}','${params[3].value}','${params[4].value}','${params[1].value}','${dates()}', '')`,
+                                conn.query(`INSERT INTO foodsdata(id_restaurant, category, name_item, price, description, images, total_item) VALUES ('${params[0].value}','${params[1].value}','${params[2].value}','${params[3].value}','${params[4].value}','${params[5].value}','${params[6].value}')`,
                                     (error, results, fields) => {
                                         if (error) {
                                             reject(new Error(error))
@@ -65,18 +65,44 @@ module.exports = {
                     })
             })
         },
-        //Update Items
-        update: (id, params) => {
-            console.log(params)
+        //Update total items
+        value: (id, params) => {
             return new Promise((resolve, reject) => {
-                conn.query(`SELECT COUNT(*) AS total from foodsdata where id_item = ${parseInt(params[1].value)} && id_restaurant = ${parseInt(params[0])}`,
+                conn.query(`SELECT total_item from foodsdata where id_item = ${params[0].value}`,
                     (error, results, fields) => {
+                        console.log(results[0].total_item)
                         if (!error) {
                             const { total } = results[0]
                             if (total === 0) {
                                 resolve(false)
                             } else {
-                                conn.query(`UPDATE foodsdata set category = ${params[2].value}, name_item = '${params[3].value}', price = '${params[4].value}', description = '${params[5].value}', images = '${params[6].value}' WHERE id_item = ${parseInt(params[1].value)}`,
+                                conn.query(`UPDATE foodsdata set total_item = ${results[0].total_item}+${params[1].value} WHERE id_item = ${params[0].value}`,
+                                    (error, results, fields) => {
+                                        if (error) {
+                                            reject(new Error(error))
+                                        }
+                                        resolve(true)
+                                    })
+                            }
+                        } else {
+                            reject(new Error(error))
+                        }
+                    })
+            })
+        },
+        //Update Items
+        update: (id, params) => {
+            console.log(params)
+            return new Promise((resolve, reject) => {
+                conn.query(`SELECT COUNT(*) AS total from foodsdata where id_item = ${params[1].value} && id_restaurant = ${params[0].value}`,
+                    (error, results, fields) => {
+                        console.log(params[2].value)
+                        if (!error) {
+                            const { total } = results[0]
+                            if (total === 0) {
+                                resolve(false)
+                            } else {
+                                conn.query(`UPDATE foodsdata set category = '${params[2].value}', name_item = '${params[3].value}', price = '${params[4].value}', description = '${params[5].value}', images = '${params[6].value}' WHERE id_item = ${params[1].value}`,
                                     (error, results, fields) => {
                                         if (error) {
                                             reject(new Error(error))

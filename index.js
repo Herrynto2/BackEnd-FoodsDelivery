@@ -11,15 +11,16 @@ app.use(bodyparser.json())
 const { user } = require('./src/routes/items')
 const { users } = require('./src/routes/resto')
 const { transaction } = require('./src/routes/transaction')
+const { guest } = require('./src/routes/guest')
 const { migration } = require('./src/routes/migration')
 const { auth } = require('./src/routes/auth')
-const { checktoken } = require('./src/middleware/authmiddleware')
 
 app.use('/migrate', migration)
 app.use('/', auth)
 app.use('/', user)
 app.use('/', users)
 app.use('/', transaction)
+app.use('/', guest)
 
 //Define Port Server
 app.listen(3000, () => {

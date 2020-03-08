@@ -5,13 +5,10 @@ const { topUp, saveCart, delItem, checkItem, checkOutItem } = require('../contro
 const { checktoken } = require('../middleware/authmiddleware')
 
 app.patch("/topup/:id", checktoken, topUp); //User General : Top Up
-app.post("/carts", checktoken, saveCart); //User General : Save items to Cart
+app.post("/carts/:id", checktoken, saveCart); //User General : Save items to Cart
 app.get("/carts/:id", checktoken, checkItem); //User General : Check lits item in the cart
 app.delete("/carts/:id", checktoken, delItem); //User General : Delete Items
-
-
-//Checkout
-app.get("/user/checkout", checkOutItem);
+app.post("/checkout/:id", checktoken, checkOutItem); //User General : Checkout
 
 
 

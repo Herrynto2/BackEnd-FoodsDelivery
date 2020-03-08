@@ -1,4 +1,4 @@
-const { conn } = require('../config/db')
+const { conn, connquery } = require('../config/db')
 const bcrypt = require('bcryptjs')
 const salt = bcrypt.genSaltSync(10);
 const { dates, codes } = require('./time')
@@ -36,60 +36,61 @@ module.exports = {
                     })
             })
         },
-        //Register Verify
-        verifyreg: (id, params) => {
-                return new Promise((resolve, reject) => {
-                            conn.query(`SELECT COUNT(*) AS total from users where id_user = ${id}`,
-                                    (error, results, fields) => {
-                                        if (!error) {
-                                            const { total } = results[0]
-                                            if (total === 0) {
-                                                resolve(false)
-                                            } else {
-                                                conn.query(`UPDATE users set ${params.map(v => `${v.keys} = '${v.value}'`).join(' , ')} WHERE id_user = ${id}`,
-                                (error, results, fields) => {
-                                    if (error) {
-                                        reject(new Error(error))
-                                    }
-                                    resolve(true)
-                                })
-                        }
-                    } else {
-                        reject(new Error(error))
-                    }
-                })
-        })
-    }, 
-    delete: (id) => {
-        return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from users where id_user = ${id}`,
-                (error, results, fields) => {
-                    if (!error) {
-                        const { total } = results[0]
-                        if (total === 0) {
-                            resolve(false)
-                        } else {
-                            const del1 = `DELETE FROM users where id_user = ${id}`
-                            const del2 = `DELETE FROM userdetail where id_user = ${id}`
-                            const del3 = [del1, del2]
-                            del3.map(e => {
-                                conn.query(e,
-                                    (error, results, fields) => {
-                                        if (error) {
-                                            reject(new Error(error))
-                                        }
+        verifyUser: (code) => {
+            return new Promise((resolve, reject) => {
+                connquery(`SELECT id_user from users WHERE verification_code= '${code}'`,
+                    (err, results, fields) => {
+                        console.log(err)
+                        if (!err) {
+                            if (results[1][0] && results[1][0].id_user) {
+                                const idUser = results[1][0].id_user
+                                conn.query(`UPDATE users SET is_verified = ${true}, verification_code = ${null} WHERE id_user = ${idUser}
+            `, (err, results, fields) => {
+                                    if (err) {
+                                        reject(new Error(err))
+                                    } else {
                                         resolve(true)
-                                    })
-                            }).join("")
+                                    }
+                                })
+                            } else {
+                                return reject(new Error('Code Verification Wrong'))
+                            }
+                        } else {
+                            return reject(new Error(err))
                         }
-                    } else {
-                        reject(new Error(error))
-                    }
-                })
-        })
-    },
-    //Delete Profile
-    delet: (id) => {
+                    })
+            })
+        },
+        delete: (id) => {
+            return new Promise((resolve, reject) => {
+                conn.query(`SELECT COUNT(*) AS total from users where id_user = ${id}`,
+                    (error, results, fields) => {
+                        if (!error) {
+                            const { total } = results[0]
+                            if (total === 0) {
+                                resolve(false)
+                            } else {
+                                const del1 = `DELETE FROM users where id_user = ${id}`
+                                const del2 = `DELETE FROM userdetail where id_user = ${id}`
+                                const del3 = [del1, del2]
+                                del3.map(e => {
+                                    conn.query(e,
+                                        (error, results, fields) => {
+                                            if (error) {
+                                                reject(new Error(error))
+                                            }
+                                            resolve(true)
+                                        })
+                                }).join("")
+                            }
+                        } else {
+                            reject(new Error(error))
+                        }
+                    })
+            })
+        },
+        //Delete Profile
+        delete: (id) => {
             return new Promise((resolve, reject) => {
                 conn.query(`SELECT * FROM users where id_user = ${id}`,
                     (error, results, fields) => {
@@ -117,17 +118,17 @@ module.exports = {
                     })
             })
         },
-    //Change Profile
-    change: (id, params) => {
-        return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from users where id_user = ${id}`,
-                (error, results, fields) => {
-                    if (!error) {
-                        const { total } = results[0]
-                        if (total === 0) {
-                            resolve(false)
-                        } else {
-                            conn.query(`UPDATE userdetail set ${params.map(v => `${v.keys} = '${v.value}'`).join(' , ')} WHERE id_user = ${id}`,
+        //Change Profile
+        change: (id, params) => {
+                return new Promise((resolve, reject) => {
+                            conn.query(`SELECT COUNT(*) AS total from users where id_user = ${id}`,
+                                    (error, results, fields) => {
+                                        if (!error) {
+                                            const { total } = results[0]
+                                            if (total === 0) {
+                                                resolve(false)
+                                            } else {
+                                                conn.query(`UPDATE userdetail set ${params.map(v => `${v.keys} = '${v.value}'`).join(' , ')} WHERE id_user = ${id}`,
                                 (error, results, fields) => {
                              
                                     if (error) {
