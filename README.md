@@ -19,7 +19,16 @@
 </ul>
 
 <h3>Using this App</h3>
-<div>
-    <p>1. Open the application with a terminal or CMD</p>
-    <p>2. Install npm (install npm)</p>
-</div>
+<hr>
+<ul>
+    <lo>Open the application with a terminal or CMD</lo>
+    <lo>Install npm (install npm)</lo>
+    <lo>Install nodemon (npm install -g nodemon) to run applications </lo>
+    <lo>Open XAMPP-control then start Apache and MySql </lo>
+    <lo>Import the database into phpMyadmin</lo>
+    <lo>Open the installed postman</lo>
+    <lo>Select the postman point to be run</lo>
+    <lo>Type the HTTP method like (http: // localhost: 3000) then send a request</lo>
+    <lo>You can check the response in the console</lo>
+</ul>
+   
