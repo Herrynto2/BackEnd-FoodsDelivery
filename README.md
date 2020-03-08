@@ -21,13 +21,14 @@
 <h3>Using this App</h3>
 <hr>
 <ul>
-    <lo>Open the application with a terminal or CMD</lo>
-    <lo>Install npm (install npm)</lo>
-    <lo>Install nodemon (npm install -g nodemon) to run applications </lo>
-    <lo>Open XAMPP-control then start Apache and MySql </lo>
-    <lo>Import the database into phpMyadmin</lo>
-    <lo>Open the installed postman</lo>
-    <lo>Select the postman point to be run</lo>
-    <lo>Type the HTTP method like (http: // localhost: 3000) then send a request</lo>
+    <li>Open the application with a terminal or CMD</li>
+    <li>Install npm (install npm)</li>
+    <li>Install nodemon (npm install -g nodemon) to run applications </li>
+    <li>Open XAMPP-control then start Apache and MySql </li>
+    <li>Import the database into phpMyadmin</li>
+    <li>Open the installed postman</li>
+    <li>Select the postman point to be run</li>
+    <li>Type the HTTP method like (http: // localhost: 3000) then send a request</li>
     <lo>You can check the response in the console</lo>
 </ul>
+   
