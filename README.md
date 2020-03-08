@@ -27,8 +27,31 @@
     <li>Open XAMPP-control then start Apache and MySql </li>
     <li>Import the database into phpMyadmin</li>
     <li>Open the installed postman</li>
-    <li>Select the postman point to be run</li>
+    <li>Select the postman end point to be run</li>
     <li>Type the HTTP method like (http: // localhost: 3000) then send a request</li>
-    <lo>You can check the response in the console</lo>
+    <li>You can check the response in the console</li>
 </ul>
-   
+
+<h3>End Point</h3>
+<hr>
+<ul>
+    <p>1. Authentication</p>
+    <li>(POST) /login</li>
+    <li>(POST) /register</li>
+    <li>(PATCH) /forgot-password</li>
+    <p>2. Super admin</p>
+    <li>(DELETE) /profile</li>
+    <li>(DELETE) /restaurant</li>
+    <p>3. Admin</p>
+    <li>(CRUD) /items</li>
+    <li>(CRUD) /restaurant</li>
+    <li>(CRUD) /category</li>
+    <p>4. General User</p>
+    <li>(CRUD) /profile</li>
+    <li>(CRUD) /carts</li>
+    <li>(CRUD) /reviews</li>
+    <p>5. Guest</p>
+    <li>(GET) /Browse-items</li>
+    <li>(GET) /Browse-restaurants</li>
+    <li>(GET) /Browse-category</li>
+</ul>
