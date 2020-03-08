@@ -35,34 +35,29 @@
 <h3>End Point</h3>
 <hr>
 <ul>
-
     <ul>
         <p>1. Authentication</p>
         <li>(POST) /login</li>
         <li>(POST) /register</li>
         <li>(PATCH) /forgot-password</li>
     </ul>
-
     <ul>
         <p>2. Super admin</p>
         <li>(DELETE) /profile</li>
         <li>(DELETE) /restaurant</li>
     </ul>
-
     <ul>
         <p>3. Admin</p>
         <li>(CRUD) /items</li>
         <li>(CRUD) /restaurant</li>
         <li>(CRUD) /category</li>
     </ul>
-
     <ul>
         <p>4. General User</p>
         <li>(CRUD) /profile</li>
         <li>(CRUD) /carts</li>
         <li>(CRUD) /reviews</li>
     </ul>
-
     <ul>
         <p>5. Guest</p>
         <li>(GET) /Browse-items</li>
