@@ -47,7 +47,7 @@ const regist = async(req, res) => {
     const { username, password, name, email, gender, address, work } = req.body
     try {
         var validasiHuruf = /^[a-z1-9]+$/;
-        if (username.match(validasiHuruf) && username.length <= 15 && username.length >= 6) {
+        if (username.match(validasiHuruf) && username.length <= 8 && username.length >= 4) {
             const create = await user.create(username, password, name, email, gender, address, work)
             if (create) {
                 res.send({ success: true, msg: 'Registration success', Verification_codes: create })
@@ -109,9 +109,10 @@ const forgotPass = async(req, res) => {
 
 //get profile user
 const getProfile = async(req, res) => {
+    const iduser = req.auth.id
     const { id } = req.params
-    if (parseInt(id) === parseInt(req.auth.id)) {
-        const detail = await user.get(id)
+    try {
+        const detail = await user.get(id, iduser)
         if (detail) {
             res.send({
                 success: true,
@@ -123,13 +124,12 @@ const getProfile = async(req, res) => {
                 message: 'Failed'
             })
         }
-    } else {
+    } catch (error) {
         res.send({
             success: false,
-            message: 'Unvalid User Id'
+            message: error.message
         })
     }
-
 }
 
 //change profile user
@@ -148,17 +148,13 @@ const changeProfile = async(req, res) => {
         }
     }).filter(o => o)
     try {
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const update = await user.change(id, params)
-            if (update) {
-                res.send({ success: true, msg: `User profile id ${id} has been updated` })
-            } else {
-                res.send({ success: false, msg: 'Failed to change profile' })
-            }
+        const iduser = req.auth.id
+        const update = await user.change(id, iduser, params)
+        if (update) {
+            res.send({ success: true, msg: `User profile id ${iduser} has been updated` })
         } else {
-            res.send({ success: false, msg: 'User id is unvalid' })
+            res.send({ success: false, msg: 'Failed to change profile' })
         }
-
     } catch (error) {
         res.send({ success: false, msg: 'Error' })
     }
@@ -166,7 +162,7 @@ const changeProfile = async(req, res) => {
 
 //Delete Profile User
 const delProfile = async(req, res) => {
-    const { id } = req.body
+    const { id } = req.params
     const del = await user.delete(id)
     if (del) {
         res.send({ success: true, Message: `delete ID :${id} success` })

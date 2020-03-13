@@ -2,6 +2,7 @@ const { conn, connquery } = require('../config/db')
 const bcrypt = require('bcryptjs')
 const salt = bcrypt.genSaltSync(10);
 const { dates, codes } = require('./time')
+const sendEmail = require('../middleware/sendEmail')
 
 module.exports = {
         //Register
@@ -14,9 +15,9 @@ module.exports = {
                             if (total !== 0) {
                                 resolve(false)
                             } else {
-                                let code = codes()
+                                let codeVerify = codes()
                                 var hashPassword = bcrypt.hashSync(`${password}`, salt);
-                                const users = `INSERT INTO users(username, password, is_verified, verification_code) VALUES ('${username}','${hashPassword}', ${false}, '${code}')`
+                                const users = `INSERT INTO users(username, password, is_verified, verification_code) VALUES ('${username}','${hashPassword}', ${false}, '${codeVerify}')`
                                 const userdetail = `INSERT INTO userdetail(id_role, name_user, email, gender, address, work) VALUES ('3','${name}','${email}','${gender}','${address}','${work}')`
                                 const data = [users, userdetail]
                                 data.map(e => {
@@ -118,16 +119,16 @@ module.exports = {
             })
         },
         //Change Profile
-        change: (id, params) => {
+        change: (id, iduser, params) => {
                 return new Promise((resolve, reject) => {
-                            conn.query(`SELECT COUNT(*) AS total from users where id_user = ${id}`,
+                            conn.query(`SELECT COUNT(*) AS total from users where id_user = ${iduser}`,
                                     (error, results, fields) => {
                                         if (!error) {
                                             const { total } = results[0]
                                             if (total === 0) {
                                                 resolve(false)
                                             } else {
-                                                conn.query(`UPDATE userdetail set ${params.map(v => `${v.keys} = '${v.value}'`).join(' , ')} WHERE id_user = ${id}`,
+                                                conn.query(`UPDATE userdetail set ${params.map(v => `${v.keys} = '${v.value}'`).join(' , ')} WHERE id_user = ${iduser}`,
                                 (error, results, fields) => {
                              
                                     if (error) {
@@ -143,16 +144,14 @@ module.exports = {
         })
     },
     //Get profile user
-    get: (id, params) => {
-        if (id) {
+    get: (id, iduser) => {
             return new Promise((resolve, reject) => {
                 console.log(id)
-                conn.query(`SELECT * FROM userdetail where id_user = ${id}`, (error, results, fields) => {
+                conn.query(`SELECT * FROM userdetail where id_user = ${iduser}`, (error, results, fields) => {
                     if (error) reject(new Error(error))
                     resolve(results)
                 })
             })
-        } 
     },
     //Forgot the Password
     update: (username, newpassword) => {

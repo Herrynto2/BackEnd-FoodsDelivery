@@ -20,16 +20,14 @@ const topUp = async(req, res) => {
         }
     }).filter(o => o)
     try {
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const update = await user.update(id, params)
-            if (update) {
-                res.send({ success: true, msg: `Topup success` })
-            } else {
-                res.send({ success: false, msg: 'Failed to top up' })
-            }
+        const iduser = req.auth.id
+        const update = await user.update(id, iduser, params)
+        if (update) {
+            res.send({ success: true, msg: `Topup success` })
         } else {
-            res.send({ success: false, msg: 'Invalid user id' })
+            res.send({ success: false, msg: 'Failed to top up' })
         }
+
     } catch (error) {
         res.send({ success: false, msg: 'Error' })
     }
@@ -38,70 +36,59 @@ const topUp = async(req, res) => {
 //Delete items
 const delItem = async(req, res) => {
     const { id } = req.params
-    const key = Object.keys(req.body)
-    const params = key.map((v, i) => {
-        if (v && (key[i] === 'id_item')) {
-            if (req.body[key[i]]) {
-                return { keys: key[i], value: req.body[key[i]] }
-            } else {
-                return null
-            }
-        } else {
-            return null
-        }
-    }).filter(o => o)
+    const iduser = req.auth.id
     try {
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const del = await user.delete(id, params)
-            if (del) {
-                res.send({ success: true, msg: `Delete item success` })
-            } else {
-                res.send({ success: false, msg: 'Failed delete item' })
-            }
+        const data = await user.delete(id, iduser)
+        if (data) {
+            res.send({
+                success: true,
+                message: 'delete items success'
+            })
         } else {
-            res.send({ success: false, msg: 'Invalid user id' })
+            res.send({
+                success: false,
+                msg: 'failed to delete item'
+            })
         }
     } catch (error) {
-        res.send({ success: false, msg: 'Error' })
+        res.send({
+            success: false,
+            msg: error.message
+        })
     }
 }
 
 //Save items 
 const saveCart = async(req, res) => {
     const { id } = req.params
-    const key = Object.keys(req.body)
-    const params = key.map((v, i) => {
-        if (v && (key[i] === 'id_item')) {
-            if (req.body[key[i]]) {
-                return { keys: key[i], value: req.body[key[i]] }
-            } else {
-                return null
-            }
-        } else {
-            return null
-        }
-    }).filter(o => o)
+    const iduser = req.auth.id
     try {
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const save = await user.create(id, params)
-            if (save) {
-                res.send({ success: true, msg: `Save item success` })
-            } else {
-                res.send({ success: false, msg: 'Failed to save item' })
-            }
+        const data = await user.create(id, iduser)
+        if (data) {
+            res.send({
+                success: true,
+                message: 'Save items success'
+            })
         } else {
-            res.send({ success: false, msg: 'Invalid user id' })
+            res.send({
+                success: false,
+                msg: 'failed to save item'
+            })
         }
     } catch (error) {
-        res.send({ success: false, msg: error.message })
+        res.send({
+            success: false,
+            msg: error.message
+        })
     }
 }
 
 //Check items
 const checkItem = async(req, res) => {
+    const iduser = req.auth.id
     const { id } = req.params
-    if (parseInt(id) === parseInt(req.auth.id)) {
-        const detail = await user.get(id)
+    try {
+        const detail = await user.get(id, iduser)
         if (detail.length > 1) {
             res.send({
                 success: true,
@@ -115,10 +102,10 @@ const checkItem = async(req, res) => {
                 data: detail
             })
         }
-    } else {
+    } catch (error) {
         res.send({
             success: false,
-            message: 'Invalid user'
+            message: error.message
         })
     }
 }
@@ -128,7 +115,7 @@ const checkOutItem = async(req, res) => {
     const { id } = req.params
     const key = Object.keys(req.body)
     const params = key.map((v, i) => {
-        if (v && (key[i] === 'id_item' || key[i] === 'total')) {
+        if (v && (key[i] === 'total')) {
             if (req.body[key[i]]) {
                 return { keys: key[i], value: req.body[key[i]] }
             } else {
@@ -139,20 +126,19 @@ const checkOutItem = async(req, res) => {
         }
     }).filter(o => o)
     try {
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const check = await user.checkout(id, params)
-            if (check) {
-                res.send({ success: true, msg: `checkout success` })
-            } else {
-                res.send({ success: false, msg: 'Failed to checkout' })
-            }
+        const iduser = req.auth.id
+        const check = await user.checkout(id, iduser, params)
+        if (check) {
+            res.send({ success: true, msg: `checkout success` })
         } else {
-            res.send({ success: false, msg: 'Invalid user id' })
+            res.send({ success: false, msg: 'Failed to checkout' })
         }
+
     } catch (error) {
         res.send({ success: false, msg: error.message })
     }
 }
+
 
 
 

@@ -4,120 +4,49 @@ const { authmiddleware } = require('../middleware/authmiddleware')
 var salt = bcrypt.genSaltSync(10);
 const qs = require('qs')
 
-const pagination = async(req, res) => {
-    //Default Condition
-    const params = {
-        currentPage: req.query.page || 1,
-        perPage: req.query.limit || 5,
-        search: req.query.search || null,
-        sort: req.query.sort || { keys: 'name', value: 0 }
-    };
-    //Reformatting Search
-    const key = Object.keys(params.search)
-    if (req.query.search) {
-        params.search = key.map((v, i) => ({ keys: key[i], value: req.query.search[key[i]] }))
-    }
-    //Reformatting Sort
-    const keysort = Object.keys(params.sort)
-    if (req.query.sort) {
-        params.sort = keysort.map((v, i) => ({ keys: key[i], value: req.query.sort[key[i]] }))
-    }
-
-    //Get data from user module
-    const data = await user.get('', params);
-
-    //Generatting Pagination
-    const { query } = req
-    query.page = parseInt(query.page + 1)
-    if (!query.page) {
-        query.page = '1'
-    }
-    console.log(query)
-
-
-    const totalPages = Math.ceil(data.total / parseInt(params.perPage))
-    query.page = parseInt(query.page) + 1
-    const nextPage = (parseInt(params.currentPage) < totalPages ? process.env.APP_URL.concat('user?').concat(qs.stringify(query)) : null)
-    console.log(nextPage)
-    query.page = parseInt(query.page) - 2
-    const previousPage = (parseInt(params.currentPage) > 1 ? process.env.APP_URL.concat('user?').concat(qs.stringify(query)) : null)
-    console.log(previousPage)
-    const pagination = {
-        currentPage: parseInt(params.currentPage),
-        nextPage,
-        previousPage,
-        totalPages,
-        perPage: parseInt(params.perPage),
-        totalEntries: data.total
-    };
-    //Send Response to End User
-    res.send({
-        success: true,
-        data: data.results,
-        pagination
-
-    })
-}
 
 //Profile Restaurant
 const getProfileResto = async(req, res) => {
-    const { id } = req.params
-    const key = Object.keys(req.body)
-    const params = key.map((v, i) => {
-        if (v && (key[i] === 'id_restaurant')) {
-            console.log(key[i])
-            if (req.body[key[i]]) {
-                return { keys: key[i], value: req.body[key[i]] }
-            } else {
-                return null
-            }
-        } else {
-            return null
-        }
-    }).filter(o => o)
+    const iduser = req.auth.id
     try {
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const detail = await user.getProfile(id, params)
-            if (detail) {
-                res.send({ success: true, msg: detail })
-            } else {
-                res.send({ success: false, msg: 'Restaurant not found' })
-            }
-        } else {
-
-        }
-    } catch (error) {
-        res.send({ success: false, message: "Unvalid id" })
-    }
-}
-
-//List Restaurant
-const getListResto = async(req, res) => {
-    const { id } = req.params
-    if (parseInt(id) === parseInt(req.auth.id)) {
-        const detail = await user.get(id)
-        console.log(detail)
-        if (detail) {
+        const data = await user.getResto(iduser)
+        if (data) {
             res.send({
                 success: true,
-                data: detail
+                data
             })
         } else {
             res.send({
                 success: false,
-                data: detail
+                msg: 'error'
             })
         }
-    } else {
+    } catch (error) {
         res.send({
             success: false,
-            message: "Unvalid id"
+            msg: error.message
         })
     }
 }
 
-//Add restaurant
 const addResto = async(req, res) => {
+    const iduser = req.auth.id
+    const { name_restaurant, logo, location, description, created_by } = req.body
+    try {
+        const add = await user.create(name_restaurant, logo, location, description, created_by, iduser)
+        if (add) {
+            res.send({ success: true, Message: 'add resto success' })
+        } else {
+            res.send({ success: false, Message: 'add resto failed' })
+        }
+    } catch (error) {
+        res.send({ success: false, Message: error.message })
+    }
+}
+
+//edit restaurant
+const editResto = async(req, res) => {
+    const iduser = req.auth.id
     const { id } = req.params
     const key = Object.keys(req.body)
     const params = key.map((v, i) => {
@@ -133,60 +62,22 @@ const addResto = async(req, res) => {
         }
     }).filter(o => o)
     try {
-        // console.log(req.auth.id)
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const detail = await user.create(id, params)
-            console.log(detail)
-            if (detail) {
-                res.send({ success: true, msg: 'Restaurant successfully created' })
-            } else {
-                res.send({ success: false, msg: 'User can only have maximal 2 restaurant in one account' })
-            }
+        const update = await user.update(id, iduser, params)
+        if (update) {
+            res.send({ success: true, msg: `restaurant id ${id} has been updated` })
         } else {
-            res.send({ success: false, message: "Unvalid id" })
+            res.send({ success: false, msg: 'Failed to update Restaurant' })
         }
     } catch (error) {
-        res.send({ success: false, message: error.message })
-    }
-}
-
-//edit restaurant
-const editResto = async(req, res) => {
-    const { id } = req.params
-    const key = Object.keys(req.body)
-    const params = key.map((v, i) => {
-        if (v && (key[i] === 'id_restaurant' || key[i] === 'name_restaurant' || key[i] === 'logo' || key[i] === 'location' || key[i] === 'description' || key[i] === 'created_by')) {
-            console.log(key[i])
-            if (req.body[key[i]]) {
-                return { keys: key[i], value: req.body[key[i]] }
-            } else {
-                return null
-            }
-        } else {
-            return null
-        }
-    }).filter(o => o)
-    try {
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const update = await user.update(id, params)
-            if (update) {
-                res.send({ success: true, msg: `restaurant id ${id} has been updated` })
-            } else {
-                res.send({ success: false, msg: 'Failed to update Restaurant' })
-            }
-        } else {
-            res.send({ success: false, msg: 'Invalid id user' })
-        }
-
-    } catch (error) {
-        res.send({ success: false, msg: 'Error' })
+        res.send({ success: false, msg: error.message })
     }
 }
 
 //Delete Restaurant
 const deleteResto = async(req, res) => {
-    const { id } = req.body
-    const del = await user.delete(id)
+    const iduser = req.auth.id
+    const { id } = req.params
+    const del = await user.delete(id, iduser)
     if (del) {
         res.send({ success: true, Message: `delete ID :${id} success` })
     } else {
@@ -197,33 +88,17 @@ const deleteResto = async(req, res) => {
 
 //Add Category
 const addCategory = async(req, res) => {
-    const { id } = req.params
-    const key = Object.keys(req.body)
-    const params = key.map((v, i) => {
-        if (v && (key[i] === 'id_restaurant' || key[i] === 'category')) {
-            if (req.body[key[i]]) {
-                return { keys: key[i], value: req.body[key[i]] }
-            } else {
-                return null
-            }
-        } else {
-            return null
-        }
-    }).filter(o => o)
+    const iduser = req.auth.id
+    const { category } = req.body
     try {
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const update = await user.addcategor(id, params)
-            if (update) {
-                res.send({ success: true, msg: `Category successfully added` })
-            } else {
-                res.send({ success: false, msg: 'Category has been available' })
-            }
+        const add = await user.addcategor(category, iduser)
+        if (add) {
+            res.send({ success: true, Message: 'add category success' })
         } else {
-            res.send({ success: false, msg: 'Invalid id user' })
+            res.send({ success: false, Message: 'add category failed' })
         }
-
     } catch (error) {
-        res.send({ success: false, msg: error.message })
+        res.send({ success: false, Message: error.message })
     }
 }
 
@@ -261,10 +136,11 @@ const addCategoryid = async(req, res) => {
 
 
 const editCategory = async(req, res) => {
+    const iduser = req.auth.id
     const { id } = req.params
     const key = Object.keys(req.body)
     const params = key.map((v, i) => {
-        if (v && (key[i] === 'id_restaurant' || key[i] === 'id_category' || key[i] === 'category')) {
+        if (v && (key[i] === 'category')) {
             if (req.body[key[i]]) {
                 return { keys: key[i], value: req.body[key[i]] }
             } else {
@@ -275,15 +151,11 @@ const editCategory = async(req, res) => {
         }
     }).filter(o => o)
     try {
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const update = await user.editcategor(id, params)
-            if (update) {
-                res.send({ success: true, msg: `Category successfully edit` })
-            } else {
-                res.send({ success: false, msg: 'Category id not found' })
-            }
+        const update = await user.editcategor(id, iduser, params)
+        if (update) {
+            res.send({ success: true, msg: `Category successfully edit` })
         } else {
-            res.send({ success: false, msg: 'Invalid id user' })
+            res.send({ success: false, msg: 'Category id not found' })
         }
 
     } catch (error) {
@@ -293,8 +165,9 @@ const editCategory = async(req, res) => {
 
 //Search list category item
 const getcategory = async(req, res) => {
+    const iduser = req.auth.id
     const { id } = req.params
-    const detail = await user.category(id)
+    const detail = await user.category(id, iduser)
     if (detail) {
         res.send({
             success: true,
@@ -310,34 +183,23 @@ const getcategory = async(req, res) => {
 }
 
 const delCategory = async(req, res) => {
+    const iduser = req.auth.id
     const { id } = req.params
-    const key = Object.keys(req.body)
-    const params = key.map((v, i) => {
-        if (v && (key[i] === 'id_category')) {
-            if (req.body[key[i]]) {
-                return { keys: key[i], value: req.body[key[i]] }
-            } else {
-                return null
-            }
-        } else {
-            return null
-        }
-    }).filter(o => o)
-    try {
-        if (parseInt(id) === parseInt(req.auth.id)) {
-            const update = await user.deletecategor(id, params)
-            if (update) {
-                res.send({ success: true, msg: `Category successfully deleted` })
-            } else {
-                res.send({ success: false, msg: 'Category id not found' })
-            }
-        } else {
-            res.send({ success: false, msg: 'Invalid id user' })
-        }
-
-    } catch (error) {
-        res.send({ success: false, msg: error.message })
+    const detail = await user.deletecategor(id, iduser)
+    if (detail) {
+        res.send({
+            success: true,
+            message: 'delete success',
+            data: detail,
+            total: detail.length
+        })
+    } else {
+        res.send({
+            success: false,
+            message: 'delete failed',
+            data: detail
+        })
     }
 }
 
-module.exports = { pagination, getProfileResto, getListResto, addCategory, addCategoryid, getcategory, editCategory, delCategory, addResto, editResto, deleteResto }
+module.exports = { getProfileResto, addResto, editResto, deleteResto, addCategory, addCategoryid, getcategory, editCategory, delCategory }

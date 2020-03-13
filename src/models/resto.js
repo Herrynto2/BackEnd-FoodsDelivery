@@ -2,41 +2,26 @@ const { conn } = require('../config/db')
 const { dates, time } = require('./time')
 
 module.exports = {
-        //List Restaurant
-        get: (id, params) => {
-            if (id) {
-                return new Promise((resolve, reject) => {
-                    conn.query(`SELECT * from restodata where id_user = ${id}`, (error, results, fields) => {
-                        if (error) reject(new Error(error))
-                        resolve(results)
-                    })
-                })
-            }
-        },
         //Profile Restaurant
-        getProfile: (id, params) => {
-            if (id) {
-                return new Promise((resolve, reject) => {
-                    console.log(id)
-                    conn.query(`SELECT * from restodata where id_user = ${id} && id_restaurant = ${params[0].value}`, (error, results, fields) => {
-                        if (error) reject(new Error(error))
-                        resolve(results)
-                    })
+        getResto: (iduser) => {
+            return new Promise((resolve, reject) => {
+                conn.query(`SELECT * from restodata where id_user = ${iduser} `, (error, results, fields) => {
+                    if (error) reject(new Error(error))
+                    resolve(results)
                 })
-            }
+            })
         },
         //Create Restaurant
-        create: (id, params) => {
+        create: (name_restaurant, logo, location, description, created_by, iduser) => {
             return new Promise((resolve, reject) => {
-                conn.query(`SELECT COUNT(*) AS total from restodata where id_user = ${id} LIMIT 1`,
+                conn.query(`SELECT COUNT(*) AS total from restodata where id_user = ${iduser} `,
                     (error, results, fields) => {
                         if (!error) {
                             const { total } = results[0]
-                            console.log(total)
-                            if (total === 2) {
+                            if (total !== 0) {
                                 resolve(false)
                             } else {
-                                conn.query(`INSERT INTO restodata(name_restaurant, id_user, logo, location, description, created_by, date_created) VALUES ('${params[0].value}', ${id}, '${params[1].value}', '${params[2].value}', '${params[3].value}', '${params[4].value}','${dates()}');UPDATE users SET is_admin = ${true} where id_user = ${id}`,
+                                conn.query(`INSERT INTO restodata(id_user, name_restaurant, logo, location, description, created_by) VALUES ('${iduser}', '${name_restaurant}', '${logo}', '${location}', '${description}', '${created_by}') ; UPDATE users SET is_admin = ${true} where id_user = ${iduser};`,
                                     (error, results, fields) => {
                                         if (error) {
                                             reject(new Error(error))
@@ -51,9 +36,9 @@ module.exports = {
             })
         },
         //delete Resto
-        delete: (id) => {
+        delete: (id, iduser) => {
             return new Promise((resolve, reject) => {
-                conn.query(`SELECT COUNT(*) AS total from restodata where id_restaurant = ${id}`,
+                conn.query(`SELECT COUNT(*) AS total from restodata where id_restaurant = ${id} && id_user = ${iduser}`,
                     (error, results, fields) => {
                         if (!error) {
                             const { total } = results[0]
@@ -75,9 +60,9 @@ module.exports = {
             })
         },
         //Edit data Resto
-        update: (id, params) => {
+        update: (id, iduser, params) => {
                 return new Promise((resolve, reject) => {
-                            conn.query(`SELECT COUNT(*) AS total from restodata where id_user = ${id} && id_restaurant = ${parseInt(params[0].value)}`,
+                            conn.query(`SELECT COUNT(*) AS total from restodata where id_user = ${iduser} && id_restaurant = ${id}`,
                                     (error, results, fields) => {
                                         console.log(params[0].value)
                                         if (!error) {
@@ -85,7 +70,7 @@ module.exports = {
                                             if (total === 0) {
                                                 resolve(false)
                                             } else {
-                                                conn.query(`UPDATE restodata set ${params.map(v => `${v.keys} = '${v.value}'`).join(' , ')}  WHERE id_restaurant = ${parseInt(params[0].value)}`,
+                                                conn.query(`UPDATE restodata set ${params.map(v => `${v.keys} = '${v.value}'`).join(' , ')}  WHERE id_restaurant = ${id}`,
                                 (error, results, fields) => {
                                     if (error) {
                                         reject(new Error(error))
@@ -100,18 +85,16 @@ module.exports = {
         })
     },
     //Add Categories
-    addcategor: (id, params) => {
+    addcategor: (category, iduser) => {
         return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from categories where category = '${params[1].value}' && id_restaurant = ${params[0].value} LIMIT 1`,
+            conn.query(`SELECT COUNT(*) AS total from categories JOIN restodata on categories.id_restaurant = restodata.id_restaurant WHERE restodata.id_user = ${iduser} && categories.category ='${category}'`,
                 (error, results, fields) => {
-                    console.log(params[1].value)
                     if (!error) {
-                        const { total } = results[0]
-                        console.log(total)
-                        if (total === 1) {
+                        const { total }  = results[0]
+                        if (total !== 0) {
                             resolve(false)
                         } else {
-                            conn.query(`INSERT INTO categories(id_restaurant, category) VALUES (${params[0].value}, '${params[1].value}')`,
+                            conn.query(`INSERT INTO categories( category) VALUES ('${category}');UPDATE categories, restodata set categories.id_restaurant = restodata.id_restaurant where categories.id_restaurant =${0} && restodata.id_user = ${iduser}`,
                                 (error, results, fields) => {
                                     if (error) {
                                         reject(new Error(error))
@@ -128,16 +111,14 @@ module.exports = {
     //Add Categories
     addcategorid: (id, params) => {
         return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from categories_id where category = '${params[1].value}' LIMIT 1`,
+            conn.query(`SELECT COUNT(*) AS total from categories_id where category = '${params[0].value}' LIMIT 1`,
                 (error, results, fields) => {
-                    console.log(params[1].value)
                     if (!error) {
                         const { total } = results[0]
-                        console.log(total)
                         if (total === 1) {
                             resolve(false)
                         } else {
-                            conn.query(`INSERT INTO categories_id(category) VALUES ('${params[1].value}')`,
+                            conn.query(`INSERT INTO categories_id(category) VALUES ('${params[0].value}')`,
                                 (error, results, fields) => {
                                     if (error) {
                                         reject(new Error(error))
@@ -152,18 +133,16 @@ module.exports = {
         })
     },
     //Edit Categories
-    editcategor: (id, params) => {
+    editcategor: (id,iduser, params) => {
         return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from categories where id_category = ${params[1].value} && id_restaurant = ${params[0].value} LIMIT 1`,
+            conn.query(`SELECT categories.id_category, categories.category FROM categories JOIN restodata on categories.id_restaurant = restodata.id_restaurant WHERE restodata.id_user = ${iduser} && categories.id_category = ${id}`,
                 (error, results, fields) => {
-                    console.log(params[1].value)
                     if (!error) {
                         const { total } = results[0]
-                        console.log(total)
                         if (total === 0) {
-                            resolve(false)
+                            resolve('faile')
                         } else {
-                            conn.query(`UPDATE categories SET category = '${params[2].value}' WHERE id_category = ${params[1].value} `,
+                            conn.query(`UPDATE categories SET category = '${params[0].value}' WHERE id_category = ${id} `,
                                 (error, results, fields) => {
                                     if (error) {
                                         reject(new Error(error))
@@ -178,36 +157,25 @@ module.exports = {
         })
     },
     //get list category
-    category: (id, params) => {
-        if (id) {
+    category: (id, iduser, params) => {
             return new Promise((resolve, reject) => {
-                console.log(id)
-                conn.query(`select categories.category FROM categories JOIN restodata ON categories.id_restaurant = restodata.id_restaurant  WHERE restodata.id_user  = ${id}`, (error, results, fields) => {
+                conn.query(`SELECT categories.id_category, categories.category FROM categories JOIN restodata on categories.id_restaurant = restodata.id_restaurant WHERE restodata.id_user = ${iduser}`, (error, results, fields) => {
                     if (error) reject(new Error(error))
                     resolve(results)
                 })
             })
-        } else {
-            return new Promise((resolve, reject) => {
-                conn.query(`select categories.category, foodsdata.name_item, foodsdata.price, foodsdata.description, foodsdata.images FROM foodsdata categories JOIN foodsdata ON categories.category = foodsdata.category`, (error, results, fields) => {
-                    if (error) reject(new Error(error))
-                    resolve(results)
-                })
-            })
-        }
     },
     //Edit Categories
-    deletecategor: (id, params) => {
+    deletecategor: (id, iduser, params) => {
         return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from categories where id_category = ${params[0].value} LIMIT 1`,
+            conn.query(`SELECT COUNT(*) AS total FROM categories JOIN restodata on categories.id_restaurant = restodata.id_restaurant WHERE restodata.id_user = ${iduser} && categories.id_category = ${id}`,
                 (error, results, fields) => {
                     if (!error) {
                         const { total } = results[0]
-                        console.log(total)
                         if (total === 0) {
                             resolve(false)
                         } else {
-                            conn.query(`DELETE FROM categories where id_category = ${params[0].value} `,
+                            conn.query(`DELETE FROM categories where id_category = ${id} `,
                                 (error, results, fields) => {
                                     if (error) {
                                         reject(new Error(error))

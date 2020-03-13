@@ -1,11 +1,17 @@
 //Import Express
 const express = require('express')
+const cors = require('cors')
+const path = require('path')
 const app = express()
+
 
 //Import MiddleWare
 const bodyparser = require('body-parser')
 app.use(bodyparser.urlencoded({ extended: false }))
 app.use(bodyparser.json())
+app.use(cors())
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+
 
 //Database connection and table create
 const { user } = require('./src/routes/items')

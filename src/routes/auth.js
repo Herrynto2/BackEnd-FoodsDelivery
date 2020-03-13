@@ -16,8 +16,12 @@ auth.post('/login', login)
 auth.patch('/forgot-password', forgotPass)
 auth.patch('/verify', Verify)
 
-auth.get('/profile/:id', checktoken, getProfile); //User General : Display the user profile
-auth.patch('/profile/:id', checktoken, changeProfile) //User General : Change profile
-auth.delete('/profile', checktoken, checkPermission.superadmin, delProfile) //Super Admin : delete Profile
+//already
+auth.get('/profile', checktoken, getProfile); //User General : Display the user profile
+auth.patch('/profile', checktoken, changeProfile) //User General : Change profile
+auth.delete('/profile/:id', checktoken, checkPermission.superadmin, delProfile) //Super Admin : delete Profile
+    //
+
+
 
 module.exports = { auth }
