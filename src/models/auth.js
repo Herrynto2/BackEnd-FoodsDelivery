@@ -2,7 +2,7 @@ const { conn, connquery } = require('../config/db')
 const bcrypt = require('bcryptjs')
 const salt = bcrypt.genSaltSync(10);
 const { dates, codes } = require('./time')
-const sendEmail = require('../middleware/sendEmail')
+const SendingEmail = require('../middleware/sendEmail')
 
 module.exports = {
         //Register
@@ -17,19 +17,19 @@ module.exports = {
                             } else {
                                 let codeVerify = codes()
                                 var hashPassword = bcrypt.hashSync(`${password}`, salt);
-                                const users = `INSERT INTO users(username, password, is_verified, verification_code) VALUES ('${username}','${hashPassword}', ${false}, '${codeVerify}')`
-                                const userdetail = `INSERT INTO userdetail(id_role, name_user, email, gender, address, work) VALUES ('3','${name}','${email}','${gender}','${address}','${work}')`
-                                const data = [users, userdetail]
-                                data.map(e => {
-                                    conn.query(e,
-                                        (error, results, fields) => {
-                                            console.log(e)
-                                            if (error) {
-                                                reject(new Error(error))
-                                            }
-                                            resolve(`${code}`)
-                                        })
-                                }).join("")
+                                conn.query(`INSERT INTO users(username, password, is_verified, verification_code) VALUES ('${username}','${hashPassword}', ${false}, '${codeVerify}');
+                                INSERT INTO userdetail(id_role, name_user, email, gender, address, work) VALUES ('3','${name}','${email}','${gender}','${address}','${work}')`,
+                                    (error, results, fields) => {
+                                        if (!error) {
+                                            SendingEmail(email, codeVerify).then((status) => {
+                                                return resolve(true)
+                                            }).catch((e) => {
+                                                reject(e)
+                                            })
+                                        }
+                                        console.log(email, codeVerify)
+                                        console.log(error)
+                                    })
                             }
                         } else {
                             reject(new Error(error))
@@ -153,50 +153,57 @@ module.exports = {
                 })
             })
     },
-    //Forgot the Password
-    update: (username, newpassword) => {
-        return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from users where username = '${username}'`,
-                (error, results, fields) => {
-                    if (!error) {
-                        const { total } = results[0]
-                        if (total === 0) {
-                            resolve(false)
-                        } else {
-                            let code = codes()
-                            var hashPassword = bcrypt.hashSync(`${newpassword}`, salt);
-                            conn.query(`UPDATE users SET password = '${hashPassword}', is_verified = ${false}, verification_code='${code}'  WHERE username = '${username}'`,
-                                (error, results, fields) => {
-                                    if (error) {
-                                        reject(new Error(error))
-                                    }
-                                    resolve(`${code}`)
-                                })
-                        }
-                    } else {
-                        reject(new Error(error))
-                    }
-                })
-        })
-    },
+    // //Forgot the Password
+    // update: (username, newpassword) => {
+    //     return new Promise((resolve, reject) => {
+    //         conn.query(`SELECT userdetail.email from users JOIN userdetail on users.id_user=userdetail.id_user WHERE  users.username = '${username}`, 
+    //         (error, results, fields) => {
+    //                 if (!error) {
+    //                     const { total } = results
+    //                     console.log(results)
+    //                     if (total === 0) {
+    //                         resolve(false)
+    //                     } else {
+    //                         let codeVerify = codes()
+    //                         var hashPassword = bcrypt.hashSync(`${newpassword}`, salt);
+    //                         conn.query(`UPDATE users SET password = '${hashPassword}', is_verified = ${false}, verification_code='${codeVerify}'  WHERE username = '${username}'`,
+    //                             (error, results, fields) => {
+    //                                 if (!error) {
+    //                                     SendingEmail(email, codeVerify).then((status) => {
+    //                                         return resolve(true)
+    //                                     }).catch((e) => {
+    //                                         reject(e)
+    //                                     })
+    //                                 }
+    //                                 console.log(email, codeVerify)
+    //                                 console.log(error)
+    //                             })
+    //                     }
+    //                 } else {
+    //                     reject(new Error(error))
+    //                 }
+    //             })
+    //     })
+    // },
     //Forgot the Password verify
     update: (username, newpassword) => {
         return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from users where username = '${username}'`,
+            conn.query(`SELECT userdetail.email from users JOIN userdetail on users.id_user=userdetail.id_user WHERE  users.username = '${username}'`,
                 (error, results, fields) => {
+                    console.log(results[0].email)
                     if (!error) {
                         const { total } = results[0]
                         if (total === 0) {
                             resolve(false)
                         } else {
-                            let code = codes()
+                            let codeVerify = codes()
                             var hashPassword = bcrypt.hashSync(`${newpassword}`, salt);
-                            conn.query(`UPDATE users SET password = '${hashPassword}', is_verified = ${false}, verification_code='${code}'  WHERE username = '${username}'`,
+                            conn.query(`UPDATE users SET password = '${hashPassword}', is_verified = ${false}, verification_code='${codeVerify}'  WHERE username = '${username}'`,
                                 (error, results, fields) => {
                                     if (error) {
                                         reject(new Error(error))
                                     }
-                                    resolve(`${code}`)
+                                    resolve(`${codeVerify}`)
                                 })
                         }
                     } else {

@@ -6,7 +6,7 @@ module.exports = {
         get: (id, iduser, params) => {
                 if (id) {
                     return new Promise((resolve, reject) => {
-                        conn.query(`SELECT foodsdata.id_restaurant, restodata.name_restaurant, foodsdata.name_item, foodsdata.price FROM foodsdata JOIN restodata on foodsdata.id_restaurant = restodata.id_restaurant where restodata.id_user = ${iduser} && restodata.id_restaurant = ${id}`, (error, results, fields) => {
+                        conn.query(`SELECT foodsdata.id_restaurant, restodata.name_restaurant, foodsdata.name_item, foodsdata.images, foodsdata.price FROM foodsdata JOIN restodata on foodsdata.id_restaurant = restodata.id_restaurant where restodata.id_user = ${iduser} && restodata.id_restaurant = ${id}`, (error, results, fields) => {
                             if (error) reject(new Error(error))
                             resolve(results[0])
                         })
@@ -48,7 +48,7 @@ module.exports = {
                             if (total === 0) {
                                 resolve(false)
                             } else {
-                                conn.query(`INSERT INTO foodsdata(id_restaurant, category, name_item, price, description, images, total_item) VALUES ('${id_restaurant}','${category}','${name_item}','${price}','${description}','${images}','${total_item}')`,
+                                conn.query(`INSERT INTO foodsdata(id_restaurant, category, name_item, price, description, images, total_item) VALUES ('${id_restaurant}','${category}','${name_item}','${price}','${description}','${images}','${total_item}');UPDATE foodsdata, restodata set foodsdata.name_restaurant=restodata.name_restaurant where restodata.id_restaurant=${id_restaurant} && foodsdata.id_restaurant=${id_restaurant}`,
                                     (error, results, fields) => {
                                         if (error) {
                                             reject(new Error(error))
@@ -147,7 +147,7 @@ module.exports = {
                         if (total === 0) {
                             resolve(false)
                         } else {
-                            conn.query(`INSERT INTO foodreview (id_user, id_item, review, rating) VALUES (${iduser}, ${id},'${params[0].value}', '${params[1].value}')`,
+                            conn.query(`INSERT INTO foodreview (id_user, id_item, review, rating) VALUES (${iduser}, ${id},'${params[0].value}', '${params[1].value}');update foodreview, userdetail set foodreview.name_user=userdetail.name_user where userdetail.id_user = ${iduser} && foodreview.name_user='${''}'`,
                                 (error, results, fields) => {
 
                                     if (error) {
@@ -189,7 +189,7 @@ module.exports = {
     }, //Get list item
     getReview: (id, iduser, params) => {
             return new Promise((resolve, reject) => {
-                conn.query(`SELECT foodsdata.name_item, foodreview.id_item,foodreview.id_user, foodreview.review, foodreview.rating, foodreview.date_created, foodreview.date_uploaded FROM foodreview JOIN foodsdata on foodreview.id_item = foodsdata.id_item WHERE foodreview.id_item = ${id}`, (error, results, fields) => {
+                conn.query(`SELECT foodsdata.name_item, foodreview.id_item, foodreview.id_user, foodreview.name_user, foodreview.review, foodreview.rating, foodreview.date_created, foodreview.date_uploaded FROM foodreview JOIN foodsdata on foodreview.id_item = foodsdata.id_item WHERE foodreview.id_item = ${id}`, (error, results, fields) => {
                     if (error) reject(new Error(error))
                     resolve(results)
                 })

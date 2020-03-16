@@ -10,9 +10,25 @@ const searchItem = async(req, res) => {
         const { id } = req.params
         const detail = await user.getitems(id)
         if (detail) {
+            console.log(detail[1])
             res.send({
                 success: true,
-                data: detail
+                data: {
+                    name_restaurant: detail[0][0].name_item,
+                    location: detail[0][0].location,
+                    id_item: detail[0][0].id_item,
+                    name_item: detail[0][0].name_restaurant,
+                    images: detail[0][0].images,
+                    price: detail[0][0].price,
+                    category: detail[0][0].category,
+                    desciption: detail[0][0].description,
+                    total_items: detail[0][0].total_items
+                },
+                review: detail[1].map(e => ({
+                    name_user: `${e.name_user}`,
+                    review: `${e.review}`,
+                    date_created: `${e.date_created}`
+                }))
             })
         } else {
             res.send({
@@ -90,11 +106,31 @@ const searchAllItem = async(req, res) => {
 const searchResto = async(req, res) => {
     const { id } = req.params
     try {
-        const data = await user.getresto(id)
-        if (data) {
+        const detail = await user.getresto(id)
+        if (detail) {
             res.send({
                 success: true,
-                data
+                detail: {
+                    id_restaurant: detail[0][0].id_restaurant,
+                    id_user: detail[0][0].id_user,
+                    name_restaurant: detail[0][0].name_restaurant,
+                    logo: detail[0][0].logo,
+                    location: detail[0][0].location,
+                    description: detail[0][0].description,
+                    created_by: detail[0][0].created_by,
+                    date_: detail[0][0].date_created,
+                    date_updated: detail[0][0].date_updated
+                },
+                items: detail[1].map(e => ({
+                    id_item: `${e.id_item}`,
+                    name_item: `${e.name_item}`,
+                    category: `${e.category}`,
+                    price: `${e.price}`,
+                    images: `${e.images}`,
+                    description: `${e.description}`,
+                    total_item: `${e.total_item}`,
+                    date_created: `${e.date_created}`
+                }))
             })
         } else {
             res.send({
@@ -197,9 +233,9 @@ const searchAllCategory = async(req, res) => {
     //Default Condition
     const params = {
         currentPage: req.query.page || 1,
-        perPage: req.query.limit || 3,
+        perPage: req.query.limit || 8,
         search: req.query.search || '',
-        sort: req.query.sort || { keys: 'name_category', value: 0 }
+        sort: req.query.sort || { keys: 'category', value: 0 }
     };
     //Reformatting Search
     const key = Object.keys(params.search)
@@ -209,8 +245,9 @@ const searchAllCategory = async(req, res) => {
     //Reformatting Sort
     const keysort = Object.keys(params.sort)
     if (req.query.sort) {
-        params.sort = keysort.map((v, i) => ({ keys: key[i], value: req.query.sort[key[i]] }))
+        params.sort = keysort.map((v, i) => ({ keys: keysort[i], value: req.query.sort[keysort[i]] }))
     }
+    console.log(params.sort)
 
     //Get data from user module
     const data = await user.getcategories('', params);
@@ -229,7 +266,6 @@ const searchAllCategory = async(req, res) => {
     console.log(query.page)
     const nextPage = (parseInt(params.currentPage) < totalPages ? process.env.APP_URL.concat('browse-category?').concat(qs.stringify(query)) : null)
     console.log(nextPage)
-
     query.page = parseInt(query.page) - 2
     console.log(query.page)
     const previousPage = (parseInt(params.currentPage) > 1 ? process.env.APP_URL.concat('browse-category?').concat(qs.stringify(query)) : null)

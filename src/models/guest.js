@@ -5,11 +5,13 @@ module.exports = {
         getresto: (id, params) => {
                 if (id) {
                     return new Promise((resolve, reject) => {
-                        const query = `SELECT *FROM restodata where id_restaurant = ${id}`
+                        const query = `SELECT * FROM restodata where id_restaurant = ${id}; 
+                        SELECT foodsdata.name_item, foodsdata.id_item, foodsdata.price, foodsdata.category, foodsdata.images, foodsdata.description, foodsdata.total_item FROM foodsdata JOIN restodata on foodsdata.id_restaurant = restodata.id_restaurant WHERE restodata.id_restaurant = ${id}`
+
                         conn.query(query, (error, result, field) => {
                             console.log(result)
                             if (error) reject = new Error(error)
-                            resolve(result[0])
+                            resolve(result)
                         })
                     })
                 } else {
@@ -44,11 +46,12 @@ module.exports = {
     getitems: (id, params) => {
         if (id) {
             return new Promise((resolve, reject) => {
-                const query = `SELECT *FROM foodsdata where id_item = ${id}`
+                const query = `SELECT  foodsdata.id_item, foodsdata.name_restaurant, foodsdata.images, restodata.location, foodsdata.name_item, foodsdata.category, foodsdata.price, foodsdata.description, foodsdata.images, foodsdata.total_item, restodata.name_restaurant FROM foodsdata JOIN restodata on foodsdata.id_restaurant = restodata.id_restaurant where foodsdata.id_item=${id} ; SELECT foodreview.name_user, foodreview.review, foodreview.date_created FROM foodsdata JOIN foodreview on foodsdata.id_item = foodreview.id_item WHERE foodsdata.id_item = ${id}`
                 conn.query(query, (error, result, field) => {
-                    console.log(result)
                     if (error) reject = new Error(error)
-                    resolve(result[0])
+                    resolve(result)
+                    if (result) {
+                    }   
                 })
             })
         } else {
@@ -69,7 +72,7 @@ module.exports = {
                         reject(new Error(error))
                     }
                     const { total } = results[0]
-                    const query = `SELECT  foodsdata.name_item, foodsdata.category, foodsdata.price, foodsdata.description, foodsdata.images, foodsdata.total_item, restodata.name_restaurant FROM foodsdata JOIN restodata on foodsdata.id_restaurant=restodata.id_restaurant  ${condition}`
+                    const query = `SELECT  foodsdata.id_item, restodata.name_restaurant, foodsdata.name_item, foodsdata.category, foodsdata.price, foodsdata.description, foodsdata.images, foodsdata.total_item, restodata.name_restaurant FROM foodsdata JOIN restodata on foodsdata.id_restaurant=restodata.id_restaurant  ${condition}`
                     conn.query(query, (error, results, fields) => {
                         if (error) {
                             reject(new Error(error))
@@ -123,9 +126,9 @@ module.exports = {
     getcategories: (id, params) => {
         if (id) {
             return new Promise((resolve, reject) => {
-                conn.query(`SELECT * FROM categories_id WHERE id = ${id}`, (error, results, fields) => {
+                conn.query(`SELECT categories_id.category, foodsdata.id_item, foodsdata.name_restaurant, foodsdata.name_item, foodsdata.price, foodsdata.description, foodsdata.images, foodsdata.total_item, foodsdata.date_created, foodsdata.date_updated FROM categories_id JOIN foodsdata ON foodsdata.category = categories_id.category WHERE categories_id.id = ${id}`, (error, results, fields) => {
                     if (error) reject(new Error(error))
-                    resolve(results[0])
+                    resolve(results)
                 })
             })
         } else {

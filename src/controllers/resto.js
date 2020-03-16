@@ -3,6 +3,7 @@ var bcrypt = require('bcryptjs')
 const { authmiddleware } = require('../middleware/authmiddleware')
 var salt = bcrypt.genSaltSync(10);
 const qs = require('qs')
+const upload = require('../middleware/upload')
 
 
 //Profile Restaurant
@@ -30,6 +31,9 @@ const getProfileResto = async(req, res) => {
 }
 
 const addResto = async(req, res) => {
+    await upload(req, res, 'logo')
+    console.log(req.file)
+    req.body.logo = '/uploads/' + req.file.filename
     const iduser = req.auth.id
     const { name_restaurant, logo, location, description, created_by } = req.body
     try {

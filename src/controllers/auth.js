@@ -10,12 +10,18 @@ const login = async(req, res, next) => {
         const { username, password } = req.body
         if (username && password) {
             const dataLogin = await new Promise((resolve, reject) => {
-                connquery(`SELECT * FROM users WHERE username='${username}' || password='${password}'`,
+                connquery(`SELECT * FROM users WHERE username='${username}' || password='${password}'; SELECT userdetail.id_user, userdetail.name_user, userdetail.images, userdetail.work, userdetail.address from userdetail JOIN users on userdetail.id_user=users.id_user where username='${username}'`,
                     (err, results) => {
+                        console.log(results[2][0].name_user)
                         if (results[1][0].is_verified === 0) {
                             reject(new Error(err || 'Please verified your account first'))
                         } else if (!err && results[1].length > 0 && bcrypt.compareSync(password, results[1][0].password)) {
-                            const userData = { username, id: results[1][0].id_user }
+                            const name_user = results[2][0].name_user
+                            const images = results[2][0].images
+                            const work = results[2][0].work
+                            const address = results[2][0].address
+                            const id_user = results[2][0].id_user
+                            const userData = { username, id: results[1][0].id_user, name_user, images, work, address, id_user }
                             resolve(userData)
                         } else {
                             reject(new Error(err || 'Username or Password Wrong'))
@@ -27,7 +33,14 @@ const login = async(req, res, next) => {
                 success: true,
                 msg: 'Login Success',
                 data: {
-                    token
+                    token,
+                    username,
+                    id_user: dataLogin.id_user,
+                    name_user: dataLogin.name_user,
+                    images: dataLogin.images,
+                    work: dataLogin.work,
+                    address: dataLogin.address
+
                 }
             })
         } else {
@@ -46,13 +59,13 @@ const login = async(req, res, next) => {
 const regist = async(req, res) => {
     const { username, password, name, email, gender, address, work } = req.body
     try {
-        var validasiHuruf = /^[a-z1-9]+$/;
-        if (username.match(validasiHuruf) && username.length <= 8 && username.length >= 4) {
+        var validasiHuruf = /^[a-z1-9]+$/
+        if (username.match(validasiHuruf) && username.length > 6) {
             const create = await user.create(username, password, name, email, gender, address, work)
             if (create) {
                 res.send({ success: true, msg: 'Registration success', Verification_codes: create })
             } else {
-                res.send({ success: false, msg: 'Character lenght must be 6-15' })
+                res.send({ success: false, msg: 'Data already available' })
             }
         } else {
             res.send({ success: false, msg: 'Failed to registration' })
@@ -91,7 +104,7 @@ const forgotPass = async(req, res) => {
     const { username, newpassword, confirmpassword } = req.body
     try {
         const update = await user.update(username, newpassword, confirmpassword)
-        console.log(newpassword)
+
         if (newpassword == confirmpassword) {
             if (update) {
                 res.send({ success: true, msg: 'Data available', verification_code: update })
