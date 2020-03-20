@@ -46,7 +46,7 @@ module.exports = {
     getitems: (id, params) => {
         if (id) {
             return new Promise((resolve, reject) => {
-                const query = `SELECT  foodsdata.id_item, foodsdata.name_restaurant, foodsdata.images, restodata.location, foodsdata.name_item, foodsdata.category, foodsdata.price, foodsdata.description, foodsdata.images, foodsdata.total_item, restodata.name_restaurant FROM foodsdata JOIN restodata on foodsdata.id_restaurant = restodata.id_restaurant where foodsdata.id_item=${id} ; SELECT foodreview.name_user, foodreview.review, foodreview.date_created FROM foodsdata JOIN foodreview on foodsdata.id_item = foodreview.id_item WHERE foodsdata.id_item = ${id}`
+                const query = `SELECT  foodsdata.id_item, foodsdata.name_restaurant, foodsdata.images, restodata.location, foodsdata.name_item, foodsdata.category, foodsdata.price, foodsdata.description, foodsdata.images, foodsdata.total_item, restodata.name_restaurant FROM foodsdata JOIN restodata on foodsdata.id_restaurant = restodata.id_restaurant where foodsdata.id_item=${id} ; SELECT foodreview.name_user, foodreview.review, userdetail.images, foodreview.date_created FROM foodsdata JOIN foodreview on foodsdata.id_item = foodreview.id_item JOIN userdetail on userdetail.id_user=foodreview.id_user WHERE foodsdata.id_item = ${id}`
                 conn.query(query, (error, result, field) => {
                     if (error) reject = new Error(error)
                     resolve(result)

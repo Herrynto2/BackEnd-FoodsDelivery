@@ -60,136 +60,135 @@ module.exports = {
             })
         },
         //Edit data Resto
-        update: (id, iduser, params) => {
-                return new Promise((resolve, reject) => {
-                            conn.query(`SELECT COUNT(*) AS total from restodata where id_user = ${iduser} && id_restaurant = ${id}`,
+        update: (id, iduser, params, logo) => {
+            return new Promise((resolve, reject) => {
+                conn.query(`SELECT COUNT(*) AS total from restodata where id_user = ${iduser}`,
+                    (error, results, fields) => {
+                        if (!error) {
+                            const { total } = results[0]
+                            if (total === 0) {
+                                resolve(false)
+                            } else {
+                                conn.query(`UPDATE restodata set name_restaurant='${params[0].value}', logo='${logo}', location='${params[1].value}', description='${params[2].value}', created_by='${params[3].value}'  WHERE id_user = ${iduser}`,
                                     (error, results, fields) => {
-                                        console.log(params[0].value)
-                                        if (!error) {
-                                            const { total } = results[0]
-                                            if (total === 0) {
-                                                resolve(false)
-                                            } else {
-                                                conn.query(`UPDATE restodata set ${params.map(v => `${v.keys} = '${v.value}'`).join(' , ')}  WHERE id_restaurant = ${id}`,
-                                (error, results, fields) => {
-                                    if (error) {
-                                        reject(new Error(error))
-                                    }
-                                    resolve(true)
-                                })
-                        }
-                    } else {
-                        reject(new Error(error))
-                    }
-                })
-        })
-    },
-    //Add Categories
-    addcategor: (category, iduser) => {
-        return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from categories JOIN restodata on categories.id_restaurant = restodata.id_restaurant WHERE restodata.id_user = ${iduser} && categories.category ='${category}'`,
-                (error, results, fields) => {
-                    if (!error) {
-                        const { total }  = results[0]
-                        if (total !== 0) {
-                            resolve(false)
+                                        if (error) {
+                                            reject(new Error(error))
+                                        }
+                                        resolve(true)
+                                    })
+                            }
                         } else {
-                            conn.query(`INSERT INTO categories( category) VALUES ('${category}');UPDATE categories, restodata set categories.id_restaurant = restodata.id_restaurant where categories.id_restaurant =${0} && restodata.id_user = ${iduser}`,
-                                (error, results, fields) => {
-                                    if (error) {
-                                        reject(new Error(error))
-                                    }
-                                    resolve(true)
-                                })
+                            reject(new Error(error))
                         }
-                    } else {
-                        reject(new Error(error))
-                    }
-                })
-        })
-    }, 
-    //Add Categories
-    addcategorid: (id, params) => {
-        return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total from categories_id where category = '${params[0].value}' LIMIT 1`,
-                (error, results, fields) => {
-                    if (!error) {
-                        const { total } = results[0]
-                        if (total === 1) {
-                            resolve(false)
+                    })
+            })
+        },
+        //Add Categories
+        addcategor: (category, iduser) => {
+            return new Promise((resolve, reject) => {
+                conn.query(`SELECT COUNT(*) AS total from categories JOIN restodata on categories.id_restaurant = restodata.id_restaurant WHERE restodata.id_user = ${iduser} && categories.category ='${category}'`,
+                    (error, results, fields) => {
+                        if (!error) {
+                            const { total } = results[0]
+                            if (total !== 0) {
+                                resolve(false)
+                            } else {
+                                conn.query(`INSERT INTO categories( category) VALUES ('${category}');UPDATE categories, restodata set categories.id_restaurant = restodata.id_restaurant where categories.id_restaurant =${0} && restodata.id_user = ${iduser}`,
+                                    (error, results, fields) => {
+                                        if (error) {
+                                            reject(new Error(error))
+                                        }
+                                        resolve(true)
+                                    })
+                            }
                         } else {
-                            conn.query(`INSERT INTO categories_id(category) VALUES ('${params[0].value}')`,
-                                (error, results, fields) => {
-                                    if (error) {
-                                        reject(new Error(error))
-                                    }
-                                    resolve(true)
-                                })
+                            reject(new Error(error))
                         }
-                    } else {
-                        reject(new Error(error))
-                    }
-                })
-        })
-    },
-    //Edit Categories
-    editcategor: (id,iduser, params) => {
-        return new Promise((resolve, reject) => {
-            conn.query(`SELECT categories.id_category, categories.category FROM categories JOIN restodata on categories.id_restaurant = restodata.id_restaurant WHERE restodata.id_user = ${iduser} && categories.id_category = ${id}`,
-                (error, results, fields) => {
-                    if (!error) {
-                        const { total } = results[0]
-                        if (total === 0) {
-                            resolve('faile')
+                    })
+            })
+        },
+        //Add Categories
+        addcategorid: (id, params) => {
+            return new Promise((resolve, reject) => {
+                conn.query(`SELECT COUNT(*) AS total from categories_id where category = '${params[0].value}' LIMIT 1`,
+                    (error, results, fields) => {
+                        if (!error) {
+                            const { total } = results[0]
+                            if (total === 1) {
+                                resolve(false)
+                            } else {
+                                conn.query(`INSERT INTO categories_id(category) VALUES ('${params[0].value}')`,
+                                    (error, results, fields) => {
+                                        if (error) {
+                                            reject(new Error(error))
+                                        }
+                                        resolve(true)
+                                    })
+                            }
                         } else {
-                            conn.query(`UPDATE categories SET category = '${params[0].value}' WHERE id_category = ${id} `,
-                                (error, results, fields) => {
-                                    if (error) {
-                                        reject(new Error(error))
-                                    }
-                                    resolve(true)
-                                })
+                            reject(new Error(error))
                         }
-                    } else {
-                        reject(new Error(error))
-                    }
-                })
-        })
-    },
-    //get list category
-    category: (id, iduser, params) => {
+                    })
+            })
+        },
+        //Edit Categories
+        editcategor: (id, iduser, params) => {
+            return new Promise((resolve, reject) => {
+                conn.query(`SELECT categories.id_category, categories.category FROM categories JOIN restodata on categories.id_restaurant = restodata.id_restaurant WHERE restodata.id_user = ${iduser} && categories.id_category = ${id}`,
+                    (error, results, fields) => {
+                        if (!error) {
+                            const { total } = results[0]
+                            if (total === 0) {
+                                resolve('faile')
+                            } else {
+                                conn.query(`UPDATE categories SET category = '${params[0].value}' WHERE id_category = ${id} `,
+                                    (error, results, fields) => {
+                                        if (error) {
+                                            reject(new Error(error))
+                                        }
+                                        resolve(true)
+                                    })
+                            }
+                        } else {
+                            reject(new Error(error))
+                        }
+                    })
+            })
+        },
+        //get list category
+        category: (id, iduser, params) => {
             return new Promise((resolve, reject) => {
                 conn.query(`SELECT categories.id_category, categories.category FROM categories JOIN restodata on categories.id_restaurant = restodata.id_restaurant WHERE restodata.id_user = ${iduser}`, (error, results, fields) => {
                     if (error) reject(new Error(error))
                     resolve(results)
                 })
             })
-    },
-    //Edit Categories
-    deletecategor: (id, iduser, params) => {
-        return new Promise((resolve, reject) => {
-            conn.query(`SELECT COUNT(*) AS total FROM categories JOIN restodata on categories.id_restaurant = restodata.id_restaurant WHERE restodata.id_user = ${iduser} && categories.id_category = ${id}`,
-                (error, results, fields) => {
-                    if (!error) {
-                        const { total } = results[0]
-                        if (total === 0) {
-                            resolve(false)
+        },
+        //Edit Categories
+        deletecategor: (id, iduser, params) => {
+            return new Promise((resolve, reject) => {
+                conn.query(`SELECT COUNT(*) AS total FROM categories JOIN restodata on categories.id_restaurant = restodata.id_restaurant WHERE restodata.id_user = ${iduser} && categories.id_category = ${id}`,
+                    (error, results, fields) => {
+                        if (!error) {
+                            const { total } = results[0]
+                            if (total === 0) {
+                                resolve(false)
+                            } else {
+                                conn.query(`DELETE FROM categories where id_category = ${id} `,
+                                    (error, results, fields) => {
+                                        if (error) {
+                                            reject(new Error(error))
+                                        }
+                                        resolve(true)
+                                    })
+                            }
                         } else {
-                            conn.query(`DELETE FROM categories where id_category = ${id} `,
-                                (error, results, fields) => {
-                                    if (error) {
-                                        reject(new Error(error))
-                                    }
-                                    resolve(true)
-                                })
+                            reject(new Error(error))
                         }
-                    } else {
-                        reject(new Error(error))
-                    }
-                })
-        })
-    },
-    search: (id, params) => {
+                    })
+            })
+        },
+        search: (id, params) => {
                 //Command Detail GET 
                 if (id) {
                     return new Promise((resolve, reject) => {

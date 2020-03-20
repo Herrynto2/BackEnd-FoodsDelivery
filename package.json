@@ -26,5 +26,8 @@
     "nodemailer": "^6.4.5",
     "nodemon": "^2.0.2",
     "qs": "^6.9.1"
+  },
+  "devDependencies": {
+    "http-proxy-middleware": "^1.0.3"
   }
 }

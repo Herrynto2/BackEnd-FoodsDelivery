@@ -32,7 +32,6 @@ const getProfileResto = async(req, res) => {
 
 const addResto = async(req, res) => {
     await upload(req, res, 'logo')
-    console.log(req.file)
     req.body.logo = '/uploads/' + req.file.filename
     const iduser = req.auth.id
     const { name_restaurant, logo, location, description, created_by } = req.body
@@ -50,25 +49,26 @@ const addResto = async(req, res) => {
 
 //edit restaurant
 const editResto = async(req, res) => {
-    const iduser = req.auth.id
-    const { id } = req.params
-    const key = Object.keys(req.body)
-    const params = key.map((v, i) => {
-        if (v && (key[i] === 'name_restaurant' || key[i] === 'logo' || key[i] === 'location' || key[i] === 'description' || key[i] === 'created_by')) {
-            console.log(key[i])
-            if (req.body[key[i]]) {
-                return { keys: key[i], value: req.body[key[i]] }
+    try {
+        await upload(req, res, 'logo')
+        req.body.logo = '/uploads/' + req.file.filename
+        const { id } = req.params
+        const key = Object.keys(req.body)
+        const params = key.map((v, i) => {
+            if (v && (key[i] === 'name_restaurant' || key[i] === 'logo' || key[i] === 'location' || key[i] === 'description' || key[i] === 'created_by')) {
+                if (req.body[key[i]]) {
+                    return { keys: key[i], value: req.body[key[i]] }
+                } else {
+                    return null
+                }
             } else {
                 return null
             }
-        } else {
-            return null
-        }
-    }).filter(o => o)
-    try {
-        const update = await user.update(id, iduser, params)
+        }).filter(o => o)
+        const iduser = req.auth.id
+        const update = await user.update(id, iduser, params, req.body.logo)
         if (update) {
-            res.send({ success: true, msg: `restaurant id ${id} has been updated` })
+            res.send({ success: true, msg: `restaurant successfully updated` })
         } else {
             res.send({ success: false, msg: 'Failed to update Restaurant' })
         }

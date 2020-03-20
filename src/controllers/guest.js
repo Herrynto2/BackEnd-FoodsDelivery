@@ -10,7 +10,6 @@ const searchItem = async(req, res) => {
         const { id } = req.params
         const detail = await user.getitems(id)
         if (detail) {
-            console.log(detail[1])
             res.send({
                 success: true,
                 data: {
@@ -27,6 +26,7 @@ const searchItem = async(req, res) => {
                 review: detail[1].map(e => ({
                     name_user: `${e.name_user}`,
                     review: `${e.review}`,
+                    images: `${e.images}`,
                     date_created: `${e.date_created}`
                 }))
             })

@@ -8,7 +8,7 @@ const { getProfileResto, addResto, editResto, deleteResto, addCategory, addCateg
 
 app.post('/restaurant', checktoken, addResto); //create restaurant : Admin
 app.get('/restaurant', checktoken, checkPermission.admin, getProfileResto); //Admin : Check profile restaurant 
-app.patch('/restaurant/:id', checktoken, checkPermission.admin, editResto); //Admin : Edit Resto
+app.patch('/restaurant', checktoken, checkPermission.admin, editResto); //Admin : Edit Resto
 app.delete('/restaurant/:id', checktoken, checkPermission.superadmin, deleteResto); //Superadmin : delete restaurant
 app.post('/categories', checktoken, checkPermission.admin, addCategory)
 app.get('/categories', checktoken, checkPermission.admin, getcategory); //search list order

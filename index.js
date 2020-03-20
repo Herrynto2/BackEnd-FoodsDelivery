@@ -6,10 +6,17 @@ const app = express()
 
 
 //Import MiddleWare
+// app.use(cors())
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', '*');
+    res.header('Access-Control-Allow-Methods', '*')
+    next();
+});
+
 const bodyparser = require('body-parser')
 app.use(bodyparser.urlencoded({ extended: false }))
 app.use(bodyparser.json())
-app.use(cors())
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 
