@@ -172,7 +172,7 @@ const checkOutItem = async(req, res) => {
     const { id } = req.params
     const key = Object.keys(req.body)
     const params = key.map((v, i) => {
-        if (v && (key[i] === 'total')) {
+        if (v && (key[i] === 'total_item')) {
             if (req.body[key[i]]) {
                 return { keys: key[i], value: req.body[key[i]] }
             } else {
@@ -188,7 +188,7 @@ const checkOutItem = async(req, res) => {
         if (check) {
             res.send({ success: true, msg: `checkout success` })
         } else {
-            res.send({ success: false, msg: 'saldo is not enought' })
+            res.send({ success: false, msg: 'failed to checkout' })
         }
 
     } catch (error) {

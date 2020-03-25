@@ -75,6 +75,7 @@ module.exports = {
                             if (total === 0) {
                                 resolve(false)
                             } else {
+                                
                                 conn.query(`INSERT INTO foodsdata(category, name_item, price, description, images, total_item) VALUES ('${category}','${name_item}','${price}','${description}','${images}','${total_item}');UPDATE foodsdata, restodata set foodsdata.name_restaurant=restodata.name_restaurant, foodsdata.id_restaurant=restodata.id_restaurant where restodata.id_user=${iduser} && foodsdata.id_restaurant=${0}`,
                                     (error, results, fields) => {
                                         if (error) {
@@ -99,7 +100,7 @@ module.exports = {
                             if (total === 0) {
                                 resolve(false)
                             } else {
-                                conn.query(`DELETE FROM foodsdata where id_item = ${id}`,
+                                conn.query(`DELETE FROM foodsdata where id_item = ${id};DELETE FROM cart where id_item=${id}`,
                                     (error, results, fields) => {
                                         if (error) {
                                             reject(new Error(error))

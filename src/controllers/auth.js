@@ -8,6 +8,7 @@ const upload = require('../middleware/upload')
 //Login
 const login = async(req, res, next) => {
     try {
+        console.log('response', res)
         const { username, password } = req.body
         if (username && password) {
             const dataLogin = await new Promise((resolve, reject) => {
@@ -49,6 +50,7 @@ const login = async(req, res, next) => {
             throw new Error('Username and Password is Required')
         }
     } catch (e) {
+        console.log('error',e)
         res.status(401).send({
             success: false,
             msg: e.message

@@ -143,28 +143,55 @@ module.exports = {
         return new Promise((resolve, reject) => {
             conn.query(`SELECT foodsdata.total_item, foodsdata.price, foodsdata.id_item, userdetail.Saldo, cart.id_cart, cart.total_item from cart join foodsdata on cart.id_item = foodsdata.id_item JOIN userdetail on cart.id_user = userdetail.id_user  WHERE cart.id_user = ${iduser} && cart.id_cart = ${id}`,
                 (error, results, fields) => {
-                    console.log('key', results)
-                    let price = results[0].Saldo - (results[0].price * params[0].value)
-                    let available = Number(results[0].total_item) - Number(params[0].value) 
+                    const idItem = results[0].id_item
+                    const valueCart = results[0].total_item //items at cart
+                    const valueCheckout = params[0].value 
+                    let balance = results[0].Saldo - (results[0].price*params[0].value) //Sisa saldo
+                    let checkout = results[0].price * params[0].value //total harga
+                    let cartLimit = valueCart - params[0].value //Sisa item at cart 
+                    
                     if (!error) {
                         const { total } = results[0]
                         if (total === 0) {
                             resolve(false)
-                        } else if (price < 0) {
-                             resolve(false)
-                             console.log('price', price)
-                        } else if (available < 0){
-                            resolve(false)
-                        }
-                         else {
-                            conn.query(`INSERT into transaction(id_cart) select id_cart from cart where id_cart = ${id} ; UPDATE transaction, userdetail set transaction.id_user=userdetail.id_user, transaction.name_user=userdetail.name_user, transaction.email=userdetail.email WHERE transaction.id_cart = ${id} && userdetail.id_user=${iduser} ; UPDATE transaction, cart SET transaction.id_restaurant=cart.id_restaurant, transaction.id_item=cart.id_item, transaction.name_item=cart.name_item, transaction.price=cart.price WHERE transaction.id_cart = ${id} ; UPDATE transaction SET total=${params[0].value}, total_price=${price} WHERE id_cart = ${id} ; UPDATE userdetail SET Saldo = ${price} WHERE id_user = ${iduser} ; UPDATE foodsdata SET total_item = ${available} WHERE id_item = ${results[0].id_item} ; DELETE FROM cart where id_cart= ${id}`,
+                        } else {
+                            conn.query(`SELECT total_item from foodsdata where id_item = ${results[0].id_item}`,
                                 (error, results, fields) => {
-                                    if (error) {
-                                        reject(new Error(error))
+                                    const valueItems = results[0].total_item
+                                    let available = valueItems - valueCheckout //sisa ketersediaan item di admin
+
+                                    if (available < 0) {
+                                        resolve(false)
+                                        return
+                                    } else if (balance < 0) {
+                                        resolve(false)
+                                        return
+                                    } else if (cartLimit <= 0) {
+                                        conn.query(`INSERT into transaction(id_cart) select id_cart from cart where id_cart = ${id} ; UPDATE transaction, userdetail set transaction.id_user=userdetail.id_user, transaction.name_user=userdetail.name_user, transaction.email=userdetail.email WHERE transaction.id_user = ${0} && userdetail.id_user=${iduser} ; UPDATE transaction, cart SET transaction.id_restaurant=cart.id_restaurant, transaction.id_item=cart.id_item, transaction.name_item=cart.name_item, transaction.price=cart.price WHERE transaction.id_restaurant = ${0} ; UPDATE transaction SET total=${params[0].value}, total_price=${checkout} WHERE total = ${0} ; UPDATE userdetail SET Saldo = ${balance} WHERE id_user = ${iduser} ; UPDATE foodsdata SET total_item = ${available} WHERE id_item = ${idItem} ; DELETE FROM cart where id_cart= ${id}`,
+                                            (error, results, fields) => {
+                                                if (error) {
+                                                    reject(new Error(error))
+                                                }
+                                                resolve(true)
+                                            })
+                                            return
+                                    } else {
+                                        conn.query(`INSERT into transaction(id_cart) select id_cart from cart where id_cart = ${id} ; UPDATE transaction, userdetail set transaction.id_user=userdetail.id_user, transaction.name_user=userdetail.name_user, transaction.email=userdetail.email WHERE transaction.id_user = ${0} && userdetail.id_user=${iduser} ; UPDATE transaction, cart SET transaction.id_restaurant=cart.id_restaurant, transaction.id_item=cart.id_item, transaction.name_item=cart.name_item, transaction.price=cart.price WHERE transaction.id_restaurant = ${0} ; UPDATE transaction SET total=${params[0].value}, total_price=${checkout} WHERE total = ${0} ; UPDATE userdetail SET Saldo = ${balance} WHERE id_user = ${iduser} ; UPDATE foodsdata SET total_item = ${available} WHERE id_item = ${idItem} ; UPDATE cart set total_item = ${valueCart}-${params[0].value} where id_cart= ${id}`,
+                                            (error, results, fields) => {
+                                                if (error) {
+                                                    reject(new Error(error))
+                                                }
+                                                resolve(true)
+                                            })
                                     }
                                     resolve(true)
                                 })
+                            
                         }
+                        
+                        //  else {
+                           
+                        // }
                     } else {
                         reject(new Error(error))
                     }

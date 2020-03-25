@@ -9,7 +9,7 @@ conn.query(`CREATE TABLE foodrating (
 )`, (error, result, fields) => {
     if (error) {
         throw error
-    } else {
+    } else {    
         console.log('success Migrating User')
     }
 })

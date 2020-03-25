@@ -18,7 +18,7 @@ const bodyparser = require('body-parser')
 app.use(bodyparser.urlencoded({ extended: false }))
 app.use(bodyparser.json())
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
-
+app.use('/api-docs', require('./src/Doc/sweager'))
 
 //Database connection and table create
 const { user } = require('./src/routes/items')

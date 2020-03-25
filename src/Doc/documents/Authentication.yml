@@ -1,0 +1,132 @@
+/login:
+  post:
+    tags:
+      - Authentication
+    summary: Login to Account
+    description: Login to Account
+    requestBody:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            require:
+              - username
+              - password
+            properties:
+              username:
+                type: string
+                examples: alen1945
+              password:
+                type: string
+                examples: mysecretpassword
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      500:
+        description: Internal Server Error
+/register:
+  post:
+    tags:
+      - Authentication
+    summary: Register Users
+    description: Register Users
+    requestBody:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            require:
+              - username
+              - password
+              - name
+              - email
+            properties:
+              username:
+                type: string
+                examples: herrynto
+              password:
+                type: string
+                examples: privatepassword
+              name:
+                type: string
+                examples: Heri Heryanto
+              email:
+                type: string
+                examples: example@gmail.com
+              gender:
+                type: string
+                examples: man
+              address:
+                type: string
+                examples: indonesin
+              work:
+                type: string
+                examples: work
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      500:
+        description: Internal Server Error
+/verify:
+  patch:
+    tags:
+      - Authentication
+    summary: Verify New Account
+    description: Use To Verify New Account
+    parameters:
+      - in : query
+        required: true
+        name: code
+        type: string
+        description: Code to Verify Account
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      500:
+        description: Internal Server Error
+/forgot-password:
+  patch:
+    tags:
+      - Authentication
+    summary: Login to Account
+    description: Login to Account
+    requestBody:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            require:
+              - username
+              - newpassword
+              - confirmpassword
+            properties:
+              username:
+                type: string
+              newpassword:
+                type: string
+              confirmpassword:
+                type: string 
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      500:
+        description: Internal Server Error

@@ -1,0 +1,50 @@
+/browse-items:
+  get:
+    tags:
+      - browse-items
+    summary: Browse All Items
+    description: Browse All Items In App
+    parameters:
+      - name: limit
+        in : query
+        type: integer
+        description: Numbers of Data PerPage
+      - name: page
+        in : query
+        type: integer
+        description: Page Number
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      500:
+        description: Internal Server Error
+
+/browse-restaurant:
+  get:
+    tags:
+      - browse-restaurant
+    summary: Browse All Restaurants
+    description: Browse All Restaurants In App
+    parameters:
+      - name: limit
+        in : query
+        type: integer
+        description: Numbers of Data PerPage
+      - name: page
+        in : query
+        type: integer
+        description: Page Number
+    responses:
+      200:
+        description: Success
+      202:
+        description: Request Accepted  but the processing has not been completed
+      400:
+        description: Error
+      500:
+        description: Internal Server Error
+
