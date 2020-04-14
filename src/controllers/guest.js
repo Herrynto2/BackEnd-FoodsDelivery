@@ -13,10 +13,10 @@ const searchItem = async(req, res) => {
             res.send({
                 success: true,
                 data: {
-                    name_restaurant: detail[0][0].name_item,
+                    name_restaurant: detail[0][0].name_restaurant,
                     location: detail[0][0].location,
                     id_item: detail[0][0].id_item,
-                    name_item: detail[0][0].name_restaurant,
+                    name_item: detail[0][0].name_item,
                     images: detail[0][0].images,
                     price: detail[0][0].price,
                     category: detail[0][0].category,
@@ -48,7 +48,7 @@ const searchAllItem = async(req, res) => {
     //Default Condition
     const params = {
         currentPage: req.query.page || 1,
-        perPage: req.query.limit || 8,
+        perPage: req.query.limit || 50,
         search: req.query.search || '',
         sort: req.query.sort || { keys: 'name_item', value: 0 }
     };

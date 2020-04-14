@@ -7,6 +7,7 @@ const qs = require('qs')
 const topUp = async(req, res) => {
     try {
         const { id } = req.params
+        console.log('req', req.body)
         const key = Object.keys(req.body)
         const params = key.map((v, i) => {
             if (v && (key[i] === 'saldo')) {
@@ -169,6 +170,7 @@ const checkItemID = async(req, res) => {
 
 //Checkout
 const checkOutItem = async(req, res) => {
+    console.log(req.body)
     const { id } = req.params
     const key = Object.keys(req.body)
     const params = key.map((v, i) => {

@@ -11,7 +11,7 @@ const getProfileResto = async(req, res) => {
     const iduser = req.auth.id
     try {
         const data = await user.getResto(iduser)
-        if (data) {
+        if (data.length === 1) {
             res.send({
                 success: true,
                 data
@@ -19,7 +19,7 @@ const getProfileResto = async(req, res) => {
         } else {
             res.send({
                 success: false,
-                msg: 'error'
+                msg: 'You havent restaurants'
             })
         }
     } catch (error) {

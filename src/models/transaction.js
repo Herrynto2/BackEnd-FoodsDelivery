@@ -39,7 +39,7 @@ module.exports = {
                         if (total === 0) {
                             resolve(false)
                         } else {
-                            conn.query(`DELETE FROM cart WHERE id_item = ${id} && id_user = ${iduser}`,
+                            conn.query(`DELETE FROM cart WHERE id_cart = ${id} && id_user = ${iduser}`,
                                 (error, results, fields) => {
 
                                     if (error) {

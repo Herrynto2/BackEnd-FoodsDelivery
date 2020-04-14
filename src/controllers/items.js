@@ -46,7 +46,8 @@ const getListItems = async(req, res) => {
         if (detail) {
             res.send({
                 success: true,
-                data: detail
+                data: detail,
+                total: detail.length
             })
         } else {
             res.send({
@@ -284,8 +285,13 @@ const listReview = async(req, res) => {
             res.send({
                 success: true,
                 name_item: detail[0].name_item,
-                Review: detail.map(e => [`id_user: ${e.id_user}`, `Review: ${e.review}`, `Rating: ${e.rating}`, `date_created: ${e.date_created}`])
-            })
+                review: detail.map(e => ({
+                    id_user: `${e.id_user}`, 
+                      Review: `${e.review}`, 
+                      Rating: `${e.rating}`, 
+                      date_created: `${e.date_created}`
+                    }))
+                })
         } else {
             res.send({
                 success: false,

@@ -6,24 +6,44 @@ require('dotenv').config()
 const upload = require('../middleware/upload')
 
 //Login
-const login = async(req, res, next) => {
+const login = async (req, res, next) => {
     try {
         console.log('response', res)
         const { username, password } = req.body
         if (username && password) {
             const dataLogin = await new Promise((resolve, reject) => {
-                connquery(`SELECT * FROM users WHERE username='${username}' || password='${password}'; SELECT userdetail.id_user, userdetail.name_user, userdetail.images, userdetail.work, userdetail.address, users.updated_at  from userdetail JOIN users on userdetail.id_user=users.id_user where users.username='${username}'`,
+                connquery(`SELECT  COUNT(*) AS total FROM users WHERE username='${username}' || password='${password}'; SELECT userdetail.id_user, users.password, users.is_verified, userdetail.name_user, userdetail.images, userdetail.work, userdetail.address, users.updated_at  from userdetail JOIN users on userdetail.id_user=users.id_user where users.username='${username}'`,
                     (err, results) => {
-                        if (results[1][0].is_verified === 0) {
-                            reject(new Error(err || 'Please verified your account first'))
-                        } else if (!err && results[1].length > 0 && bcrypt.compareSync(password, results[1][0].password)) {
+                        console.log(results[2][0])
+                        const { total } = results[1][0]
+                        console.log(total)
+                        if (total === 0) {
+                            reject(new Error(err || 'your username hasnt been registered'))
+                            res.send({
+                                success: false,
+                                msg: 'your username hasnt been registered',
+                                data: {
+                                    token: ''
+                                }
+                            })
+                        }
+                        else if (results[2][0].is_verified === 0) {
+                            res.send({
+                                success: false,
+                                msg: 'Please verified your account first',
+                                data: {
+                                    token: ''
+                                }
+                            })
+                        }
+                        else if (!err && results[1].length > 0 && bcrypt.compareSync(password, results[2][0].password)) {
                             const name_user = results[2][0].name_user
                             const images = results[2][0].images
                             const work = results[2][0].work
                             const address = results[2][0].address
                             const id_user = results[2][0].id_user
                             const updated_at = results[2][0].updated_at
-                            const userData = { username, id: results[1][0].id_user, name_user, images, work, address, id_user, updated_at }
+                            const userData = { username, id: results[2][0].id_user, name_user, images, work, address, id_user, updated_at }
                             resolve(userData)
                         } else {
                             reject(new Error(err || 'Username or Password Wrong'))
@@ -50,7 +70,7 @@ const login = async(req, res, next) => {
             throw new Error('Username and Password is Required')
         }
     } catch (e) {
-        console.log('error',e)
+        console.log('error', e)
         res.status(401).send({
             success: false,
             msg: e.message
@@ -59,19 +79,19 @@ const login = async(req, res, next) => {
 }
 
 //Registration
-const regist = async(req, res) => {
-    const { username, password, name, email, gender, address, work } = req.body
+const regist = async (req, res) => {
+    const { username, password, name, email } = req.body
     try {
         var validasiHuruf = /^[a-z1-9]+$/
-        if (username.match(validasiHuruf) && username.length > 6) {
-            const create = await user.create(username, password, name, email, gender, address, work)
+        if (username.match(validasiHuruf) && username.length > 7) {
+            const create = await user.create(username, password, name, email)
             if (create) {
                 res.send({ success: true, msg: 'Registration success', Verification_codes: create })
             } else {
                 res.send({ success: false, msg: 'Data already available' })
             }
         } else {
-            res.send({ success: false, msg: 'Failed to registration' })
+            res.send({ success: false, msg: 'username must be lowercarse and minimal 8 charachter' })
         }
     } catch (error) {
         res.send({ success: false, msg: error.message })
@@ -79,7 +99,7 @@ const regist = async(req, res) => {
 }
 
 //Registration Verify
-const Verify = async(req, res, next) => {
+const Verify = async (req, res, next) => {
     try {
         if (!req.query.code) {
             throw new Error('Required Query code')
@@ -103,7 +123,24 @@ const Verify = async(req, res, next) => {
 }
 
 //Forgot the password
-const forgotPass = async(req, res) => {
+const checkUser = async (req, res) => {
+    const { username } = req.body
+    try {
+        const check = await user.checkUsername(username)
+        if (check) {
+            res.send({ success: true, msg: 'Data available'})
+        } else {
+            res.send({ success: false, msg: 'username is not found' })
+        }
+    }
+    catch (error) {
+        res.send({ success: false, msg: error.message })
+    }
+}
+
+
+//Forgot the password
+const forgotPass = async (req, res) => {
     const { username, newpassword, confirmpassword } = req.body
     try {
         const update = await user.update(username, newpassword, confirmpassword)
@@ -112,7 +149,7 @@ const forgotPass = async(req, res) => {
             if (update) {
                 res.send({ success: true, msg: 'Data available', verification_code: update })
             } else {
-                res.send({ success: false, msg: 'failed to registration' })
+                res.send({ success: false, msg: 'username is not found' })
             }
         } else {
             res.send({ success: false, msg: 'new password and confirm password must be same' })
@@ -124,7 +161,7 @@ const forgotPass = async(req, res) => {
 }
 
 //get profile user
-const getProfile = async(req, res) => {
+const getProfile = async (req, res) => {
     const iduser = req.auth.id
     const { id } = req.params
     try {
@@ -149,7 +186,7 @@ const getProfile = async(req, res) => {
 }
 
 //change profile user
-const changeProfile = async(req, res) => {
+const changeProfile = async (req, res) => {
     try {
         await upload(req, res, 'images')
         req.body.images = '/uploads/' + req.file.filename
@@ -180,7 +217,7 @@ const changeProfile = async(req, res) => {
 }
 
 //Delete Profile User
-const delProfile = async(req, res) => {
+const delProfile = async (req, res) => {
     const { id } = req.params
     const del = await user.delete(id)
     if (del) {
@@ -192,4 +229,4 @@ const delProfile = async(req, res) => {
 
 
 
-module.exports = { login, regist, Verify, forgotPass, changeProfile, delProfile, getProfile }
+module.exports = { login, regist, Verify, forgotPass, checkUser, changeProfile, delProfile, getProfile }

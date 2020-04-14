@@ -55,7 +55,7 @@ module.exports = {
  
     getAll: (iduser) => {
         return new Promise((resolve, reject) => {
-            conn.query(`SELECT foodsdata.id_restaurant, foodsdata.id_item, restodata.name_restaurant, foodsdata.name_item, foodsdata.images, foodsdata.price FROM foodsdata JOIN restodata on foodsdata.id_restaurant = restodata.id_restaurant where restodata.id_user = ${iduser}`, (error, results, fields) => {
+            conn.query(`SELECT foodsdata.id_restaurant, foodsdata.total_item, foodsdata.description, foodsdata.id_item, restodata.name_restaurant, foodsdata.name_item, foodsdata.images, foodsdata.price FROM foodsdata JOIN restodata on foodsdata.id_restaurant = restodata.id_restaurant where restodata.id_user = ${iduser}`, (error, results, fields) => {
                 console.log(results)
                 if (error) reject(new Error(error))
                 resolve(results)
