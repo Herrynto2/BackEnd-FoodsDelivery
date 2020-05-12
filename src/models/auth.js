@@ -6,10 +6,10 @@ const SendingEmail = require("../middleware/sendEmail");
 
 module.exports = {
   //Register
-  create: (username, password, name, email, gender, address, work) => {
+  create: (username, password, name, email) => {
     return new Promise((resolve, reject) => {
       conn.query(
-        `SELECT COUNT(*) AS total from users where username = '${username}' && password = '${password}'`,
+        `SELECT COUNT(*) AS total from users where username = '${username}'`,
         (error, results, fields) => {
           if (!error) {
             const { total } = results[0];
@@ -32,7 +32,6 @@ module.exports = {
                       });
                   }
                   console.log(email, codeVerify);
-                  console.log(error);
                 }
               );
             }
@@ -206,11 +205,11 @@ module.exports = {
       );
     });
   },
-  //Forgot the Password verify
+  //Forgot the Password
   update: (username, newpassword) => {
     return new Promise((resolve, reject) => {
       conn.query(
-        `SELECT COUNT(*) AS total from users where is_verified=${false}`,
+        `SELECT COUNT(*) AS total from users where username='${username}'`,
         (error, results, fields) => {
           if (!error) {
             const { total } = results[0];

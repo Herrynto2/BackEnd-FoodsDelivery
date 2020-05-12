@@ -13,7 +13,7 @@ const login = async (req, res, next) => {
     if (username && password) {
       const dataLogin = await new Promise((resolve, reject) => {
         connquery(
-          `SELECT  COUNT(*) AS total FROM users WHERE username='${username}' || password='${password}'; SELECT userdetail.id_user, users.password, users.is_verified, userdetail.name_user, userdetail.images, userdetail.work, userdetail.address, users.updated_at  from userdetail JOIN users on userdetail.id_user=users.id_user where users.username='${username}'`,
+          `SELECT  COUNT(*) AS total FROM users WHERE username='${username}' || password='${password}'; SELECT userdetail.id_user, users.password, users.is_verified, userdetail.name_user, userdetail.images, userdetail.work, userdetail.address,  users.updated_at, userdetail.email, userdetail.Saldo, userdetail.gender  from userdetail JOIN users on userdetail.id_user=users.id_user where users.username='${username}'`,
           (err, results) => {
             console.log(results[2][0]);
             const { total } = results[1][0];
@@ -46,6 +46,9 @@ const login = async (req, res, next) => {
               const address = results[2][0].address;
               const id_user = results[2][0].id_user;
               const updated_at = results[2][0].updated_at;
+              const email = results[2][0].email;
+              const gender = results[2][0].gender;
+              const Saldo = results[2][0].Saldo;
               const userData = {
                 username,
                 id: results[2][0].id_user,
@@ -55,6 +58,9 @@ const login = async (req, res, next) => {
                 address,
                 id_user,
                 updated_at,
+                email,
+                gender,
+                Saldo,
               };
               resolve(userData);
             } else {
@@ -78,6 +84,9 @@ const login = async (req, res, next) => {
           work: dataLogin.work,
           address: dataLogin.address,
           updated_at: dataLogin.updated_at,
+          email: dataLogin.email,
+          gender: dataLogin.gender,
+          Saldo: dataLogin.Saldo,
         },
       });
     } else {
@@ -213,6 +222,7 @@ const getProfile = async (req, res) => {
 
 //change profile user
 const changeProfile = async (req, res) => {
+  console.log("ok", req);
   try {
     await upload(req, res, "images");
     req.body.images = "/uploads/" + req.file.filename;
